@@ -1,59 +1,73 @@
-// 8 типов данных 
-// number, bigInt, string, boolean, undefined, null, object, symbol
+// Operators
+let lessons = 10;
 
-// Number 
-const age = 28;
-console.log(typeof age); // number
+lessons = 10 + 10; // 20
+lessons = 10 - 5; // 5
+lessons = 10 * 10; // 100
+lessons = 10 / 10; // 1
+lessons = 11 % 2; // 1 // остаток от деления 
+// console.log(lessons);
 
-// String 
-const firstName = 'Artem';
-console.log(typeof firstName); // string
+// ---------------------------------
+let x;
+x = 2 ** 2; // возведение в степень // 4
+x = 2 ** 3; // возведение в степень // 8
 
-// BigInt
-const bigNumber = 1287644238009876543356n; // в конце больших чисел добавляем букву n
-console.log(typeof bigNumber); // bigint
+x = 1;
+x = x + 1; // 2 // x++
+x = x - 1; // 1 // x--
 
-// Boolean (true или false)
-const isActive = true;
-const isConfirmed = false;
-console.log(typeof isActive); // boolean
+console.log(x);
 
-// Null - это пусто, либо ничего, другими словами ничего не значит 
-const city = null; // значение присвоено 
-console.log(typeof city); // object //  это не правильно, это значение оставили для совместимости старых браузеров
-// null показывает что это object (просто нужно запомнить)
+// ---------------------------------
 
-// Undefined - переменная есть, но она не имеет значения
-let isLoading; // значение не присвоено 
-console.log(isLoading); // undefined // значение 
-console.log(typeof isLoading); // undefined // тип данных 
-// isLoading = undefined;
-isLoading = false;
-console.log(isLoading); // false
+let a = 10;
+let b = a++; // постфиксный инкремент 
+// let b = a--; // постфиксный декремент
 
-// Symbol - используется для уникальных идентификаторов в объекте
-const id = Symbol('123');
-console.log(typeof id); // symbol
+console.log(b); // 10
+console.log(a); // 11
 
-// Ссылочные типы
-// Object
-const person = {
-  name: 'Alex', // ключ объекта: значение объекта
-  age: 24,      // ключ объекта: значение объекта
-  id: id,       // ключ объекта: значение объекта
-  isActive: isActive // если ключ и значение совпадают, то можно просто записывать ключ isActive
-};
-console.log(typeof person); // object
-console.log(person); // Object { name: "Alex", age: 24, id: Symbol("123"), isActive: true }
+let c = 10;
+let d = --c;    // префиксный декремент
+// let d = ++c; // префиксный инкремент 
 
-// Array (относится к объекту)
-const numArr = [1, 2, 3, 4, 5];
-console.log(typeof numArr); // object
-console.log(numArr); // Array(5) [ 1, 2, 3, 4, 5 ]
+console.log(d); // 9
+console.log(c); // 9
 
-// function (относится к объекту, но тип данных у неё выводится как function, )
-function info() {
-  return 'Hello World!';
-}
-console.log(typeof info); // function (тип данных function нет в js, это объект, нужно запомнить правило)
+// ---------------------------------
+// Операторы присваивания
+
+let d1 = 10;
+d1 = d1 + 1; 
+d1 += 1; // сокращенный вариант 
+// d1 -= 1;
+// d1 *= 1;
+// d1 /= 1;
+// d1 %= 1;
+// d1 **= 1;
+console.log(d1); // 12
+
+// Операторы сравнения
+// >, <, >=, <=
+// ==, ===, !=, !==
+
+console.log(1 == 1); // true // нестрогое равенство 
+console.log(1 === 1); // true // строгое равенство 
+
+console.log(1 == '1'); // true // нестрогое равенство // сравнение числа с строкой
+console.log(1 === '1'); // false // строгое равенство // сравнение числа с строкой
+// в проектах всегда использовать === , == -> это уже устаревший вариант
+
+console.log(1 != '1'); // false // нестрогое неравенство
+console.log(1 !== '1'); // true // строгое неравенство
+// в проектах всегда использовать !==
+
+// ---------------------------------
+// Конкатенация (объединения)
+const greeting = 'Hello ' + 'World!';
+
+console.log(greeting); // Hello World!
+console.log(1 + 'hello'); // 1hello // string
+console.log(1 + '1'); // 11 // string
 
