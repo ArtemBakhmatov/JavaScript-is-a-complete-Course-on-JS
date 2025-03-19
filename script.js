@@ -1,122 +1,71 @@
-let value = 10;
+// If statements - Условные ветвления
 
-// число в строку 
+const age = 18;
 
-value = value + '';         // 1 вариант преобразования в строку
-value = `${ value }`;       // 2 вариант преобразования в строку
-value = value.toString();   // 3 вариант преобразования в строку
-value = String(value);      // 4 вариант преобразования в строку
-console.log(value);   // 10 // string
+// if (age >= 18) {
+//   console.log('Заходи!');
+// } else {
+//   console.log('Ещё рановато тебе!');
+// }
 
-// строку в число
+if (age !== 18) { // Условие всегда срабатывает только при правдивом условии 
+  console.log('Ещё рановато тебе!'); // не сработает условие 
+}
 
-value = Number(value);      // 1 вариант преобразования в число
-value = '10';
-value = +value;             // 2 вариант преобразования в число
-value = '10a'
-value = parseInt(value);    // 3 вариант преобразования в число, буквы удаляет, '10a' -> 10
-console.log(value);   // 10 // number
+// Инструкция if (...) вычисляет выражение в скобках и преобразует результат к логическому типу
 
-value = '10.333';
-value = parseFloat(value); // превращает число с плавающей точкой
-console.log(value);   // 10.333 // number
+/* 
+  Число 0, пустая строка '', null, undefined и NaN становятся false.
+  Из-за этого их называют "ложными" ("falsy") значениями.
+  Остальные значения становятся true, поэтому их называют "правдивыми" ("truthy")
+*/
 
-value = parseInt(value); // этот метод делает целое число и удаляет буквы
-console.log(value);   // 10 // number 
+if (0) {} // false
+if (1) {} // true
+if ('1') {} // true
+if ('') {} // false
+if (' ') {} // true
 
-value = 10.12345;
-value = value.toFixed(3); // после плавающей точки остается три числа и становится строкой
-console.log(value);   // 10.123 // string 
+if (true) {
+  console.log('Правда');
+}
 
-value = parseFloat(value); // преобразуем в число с плавающей точкой
-console.log(value);   // 10.123 // number
+if (false) {
+  console.log('эта ветка не выполнится никогда');
+}
 
-// -----------------------------
-// Casting
+// -----------------------------------
 
-value = 10 + '10';
-console.log(value);   // 1010 // string
+const res = prompt('Как ваши дела?', 'хорошо'); // 2 аргумент - это дефолтный ответ 
 
-value = 10 * '10';
-console.log(value);   // 100 // number
+if (res === 'хорошо') {
+  alert('Вы Красавчик!');
+} else if (res === 'норм') {
+  alert('Стремитесь чтобы было хорошо!');
+} else if (res === 'плохо') {
+  alert('Погуляйте на природе!');
+} else {
+  alert('Не знаю что вам сказать!');
+}
 
-value = 10 / '10';
-console.log(value);   // 1 // number
+// -----------------------------------
+// Тернарный оператор (три оператора)
+ 
+const myAge = 20;
 
-value = 10 - '10';
-console.log(value);   // 0 // number
+/* 
+  if (myAge > 18) {
+    // ...
+  } else {
+    // ...
+  }
+*/
 
-value = 10 % '10';
-console.log(value);   // 0 // number
+// ? = if
+// : = else
+// условие ? выражение1 : выражение2
 
-value = 10 + true; // true -> это 1
-console.log(value);   // 11 // number
+myAge > 18 ? console.log('Можно всё!') : console.log('Погоди ещё');
 
-value = 10 + false; // false -> это 0
-console.log(value);   // 10 // number
-
-value = 10 + null; // null -> это ничего 
-console.log(value);   // 10 // number
-
-value = 10 + undefined; // undefined нельзя сложить с другим числом
-console.log(value);   // NaN // не число
-
-value = 10 + NaN; // NaN нельзя сложить с другим числом
-console.log(value);   // NaN // не число
-
-value = 10 + []; // число складываем с пустым массивом будет строка
-console.log(value);   // 10 // string
-
-value = 10 + {}; // число складываем с пустым объектом будет строка
-console.log(value);   // 10[object Object] // string
-
-value = true + true;
-console.log(value);   // 2 // number
-
-value = true + false;
-console.log(value);   // 1 // number
-
-value = false + false;
-console.log(value);   // 1 // number
-
-// -----------------------------
-// == сравнивается с приведением к одному типу
-// === сравнивается по типу и по значению без приведения к одному типу
-
-let res;
-
-res = true == true;
-console.log(res); // true
-
-res = true === true;
-console.log(res); // true
-
-res = true == 1;  // тут сравнением по значению
-console.log(res); // true
-
-res = true === 1; // тут сравнением по значению и по типу данных
-console.log(res); // false 
-
-res = false == 0; // тут сравнением по значению
-console.log(res); // true
-
-res = false === 0; // тут сравнением по значению и по типу данных
-console.log(res); // false 
-
-res = 1 == '1'; 
-console.log(res); // true
-
-res = 1 === '1'; 
-console.log(res); // false
-
-res = null == undefined;
-console.log(res); // true
-
-res = null === undefined;
-console.log(res); // false
-
-res = '' == [];
-console.log(res); // true
-
-res = '' === [];
-console.log(res); // false
+const check = myAge > 18 ? 'Можно всё!' : 'Погоди ещё';
+console.log(check); // Можно всё!
