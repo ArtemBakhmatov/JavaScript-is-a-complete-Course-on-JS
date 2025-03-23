@@ -1,34 +1,39 @@
-// Logical assignment - логические присваивание 
+// Number (числа)
 
-// ||= присваивает значение в правой части, если значение слева false иначе значение из левой части
+let x = 10;
 
-let a = null;
+x = Number(100); // 100 // number
+x = new Number(1000); // Number { 1000 }
+x = x.valueOf(); // 1000 // number
 
-a = a || 20;
-a ||= 20; // сокращенная запись 
+console.log(x);
 
-console.log(a); // 20
+// ----------------- Методы -------------------
+// строка
+let num = 20;
 
-// &&= присваивает значение из правой части если левое значение truthy
+num = num.toFixed(); // 20 // приводит значение к строке // после запетой можно убрать числа
+num = 20.3333;
+num = num.toFixed(2); // 20.33 // это строка, если нет ничего в скобках, то вернет только целое число , строка
+num = 20.4444;
+num = num.toPrecision(3); // 20.4 // строка // тут числа убираются от начала целого числа
+num = num.toString(); // 20.4 // также преобразует в строку
+num = num.toString().length; // 4 // получаем длину строки 
 
-let b = 1;
+console.log(num);
 
-b = b && 2;
-b &&= 2;
+num = new Number(0) // Number { 0 } // число  // экземпляр класса
 
-console.log(b); // 2 
+if (num) { // условие сработает так как num сейчас объект
+  console.log('check');
+}
 
-// ??= присваивает правое значение если слева null или undefined.
+// --------------------------------
 
-let c = undefined;
+const maxNumber = Number.MAX_VALUE;
+const minNumber = Number.MIN_VALUE;
 
-c = c ?? 10;
-c ??= 10;
+console.log(maxNumber); // 1.7976931348623157e+308
+console.log(minNumber); // 5e-324
 
-console.log(c); // 10
-
-c = false;
-c ??= 10;
-
-console.log(c); false 
 
