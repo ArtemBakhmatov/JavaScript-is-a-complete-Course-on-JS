@@ -1,87 +1,125 @@
-// Function - scope, default, values, declaration vs expression
+// Function - callbacks, iife, arrow functions
 
 const log = console.log;
 
-// ------- Function Declaration vs Function Expression ---------
-
-// Function Declaration
-greeting(); // функцию можно вызвать до ее объявления
-// почему так происходит, потому что сначала javaScript читает скрипты со словом function
-// поэтому так и происходит что можно вызвать функцию до ёё объявления, а когда будет загружаться 
-// страница в браузере, то с начала javaScript читает скрипты со словом function
 function greeting() {
-  log('Hello World!');
+  log('Hello my friends!');
 }
 
-// greeting();
-
-// Function Expression
-
-// greetingFn(); при вызове функции до её объявления работать не будет
-// потому что функция greetingFn объявлена в виде переменной и JS читает сверху вниз
-// поэтому работать не будет 
-
-const greetingFn = function greeting() { // функциональное выражение
-  log('Hello Function Expression');
+function showGreeting(callback) {
+  callback();
 }
 
-greetingFn();
+showGreeting(greeting); // greeting передаем как ссылку
 
-// -------------- Scope (область видимости) -----------------
+// ----------------------
 
-// Глобальная область видимости (global scope)
-const num1 = 10;
-
-{
-  // тут уже локальная область видимости
-  const num2 = 20;
-  log(num1); // 10 // сработает, локальный scope видит глобальный
-  log(num2); // 20 // сработает , а за пределами фигурных скобок не сработает
-
-  var num3 = 100; // var - исключение 
+function getInfo(name, age) {
+  return `Name: ${ name }; Age: ${ age }`;
 }
 
-log(num3); // 100 // сработает // var - всегда глобальная область видимости, где бы он не находился
+function getInfoWithCurrentDate(callback) { 
+  const now = new Date();
 
-log(num1);
-// log(num2); // error // не сработает
+  log(`Today: ${ now.toISOString() } \n ${ callback('Artem', 37) }`);
+}
 
-function showScopeExample() {
-  const num4 = 1000;
-  log('showScopeExample', num1, num4);
+getInfoWithCurrentDate(getInfo);
 
-  function nestedFn() { // вложенная функция
-    const num5 = 3000;
-    log('showScopeExample', num4, num5);
+// callback -> можно писать и так cb (он тоже может встречаться в проектах)
+
+// --------------------------------------------
+
+function survey(question, agreedFn, disagreedFn) { // опрос(запрос, ответ, ответ)
+  if (confirm(question)) {
+    agreedFn();
+  } else {
+    disagreedFn();
   }
-  nestedFn();
 }
 
-showScopeExample(); 
-// nestedFn(); // не сработает, так как она локальная область видимости
-// log(num4); // тоже не сработает , локальная область видимости
+survey(
+  'Ты мой друг!',
+  function () { log('Ты согласился, что ты мой друг!😀')},
+  function () { log('Ты на согласился, получается что ты не друг!😡')}
+);
 
-// ----------- Default values - Значения по умолчанию ---------------
 
-// function formatGreeting(name, emoji = '👽') {
-//   log(`Hello ${ name } ${ emoji }`);
-// }
+// ---------- Стрелочные функции (arrow functions) ----------
 
-function formatGreeting(name, emoji = '👽') {
-  return `Hello ${ name } ${ emoji }`;
+const sum = (a, b) => {
+  return a + b;
 }
 
-// formatGreeting('Artem', '🙂');
-// formatGreeting('Artem');
+log(sum(3, 5)); // 8
 
-log(formatGreeting('Artem', '🙂')); // Hello Artem 🙂
-log(formatGreeting('Artem')); // Hello Artem 👽
+const multiplication = (a, b) => a * b; // тут уже есть return внутри если пишем без фигурных скобок
 
-// результат работы функции 
-const formattedGreeting = formatGreeting('Artem', '👊👊👊👊👊');
-log(formattedGreeting); // Hello Artem 👊👊👊👊👊
+log(multiplication(3, 5)); // 15
 
-// function expression 
+const showName = name => `Name: ${ name }`;
 
-const formattedGreeting2 = formatGreeting;
-log(formattedGreeting2('Artem', '🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘')); // Hello Artem 🤘🤘🤘🤘🤘🤘🤘🤘🤘🤘
+log(showName('Artem'));
+
+// -------------- IIFE -----------------
+// Немедленно вызывающая функция 
+// Immediately-invoked function expressions 
+
+(
+  function () {
+    var message = 'Hello!';
+    log(message);
+  }
+)();
+
+// log(message); // тут мы получим ошибку, так раньше делали чтобы var не выходил за глобальную 
+// область видимости, (тут пишем функцию)(), т.е. таким методом ограничиваем область видимости var
+
+(
+  function (name) {
+    var message = 'Hello!';
+    log(message, name); // Hello! Anna
+  }
+)('Anna'); 
+
+// Call Stack (Стек вызовов)
+
+/* 
+function one() {
+  log('One');
+}
+
+function two() {
+  log('Two');
+}
+
+function three() {
+  log('Three');
+}
+
+// тут всё вызовется по порядку
+one();
+two();
+three(); 
+*/
+
+function one() {
+  log('One');
+  two();
+}
+
+function two() {
+  log('Two');
+  three();
+}
+
+function three() {
+  log('Three');
+}
+
+one();
+// ответ будет такой:
+// One
+// Two
+// Three
+
