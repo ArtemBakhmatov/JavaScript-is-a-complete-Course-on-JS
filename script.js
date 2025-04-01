@@ -1,125 +1,111 @@
-// Function - callbacks, iife, arrow functions
+// Objects - Объекты 
+
+// Объекты это ссылочный тип переменной 
+/* 
+  У объектов есть свойства.
+  Свойство - это пара "ключ: значение", где ключ - это строка (также называется "именем свойства"),
+  а значение может быть чем угодно.
+*/
 
 const log = console.log;
 
-function greeting() {
-  log('Hello my friends!');
+const hobby = 'hobby';
+const id = '13#smIsd@';
+
+// const const person = new Object();
+const person = {
+  name: 'Artem',
+  age: 37,
+  isDeveloper: true,
+  address: {
+    country: 'Poland',
+    city: 'Gdansk',
+    street: 'Main street 999'
+  },
+  0: 'just 0',
+  'last name': 'Miracle',
+  greet: function() {
+    log('Hello, I am Artem!');
+  },
+  greetSecond: () => log('greetSecond!'),
+  hobby: 'skiing, coding',
+  // [hobby]: 'skiing, coding', можно писать и таким вариантом
+  id, // тут можем просто ключ прописать, если не будем присваивать другое значение
+  // id: id // результат тот же 
 }
 
-function showGreeting(callback) {
-  callback();
-}
+log(person); // Object { name: "Artem", age: 37 }
+log(person.name); // 'Artem'
+log(person.age);  // 33
 
-showGreeting(greeting); // greeting передаем как ссылку
+log(person['name']);// 'Artem'
+log(person['age']); // 33
 
-// ----------------------
+log(person.isDeveloper); // true
+log(person.isPositive); // undefined // так как нет этого ключа в объекте
+// log(person.isPositive.qwerty); // error
 
-function getInfo(name, age) {
-  return `Name: ${ name }; Age: ${ age }`;
-}
+log(person.address); // Object { country: "Poland", city: "Gdansk", street: "Main street 999" }
+log(person.address.city, person.address.country, person.address.street); // Gdansk Poland Main street 999
 
-function getInfoWithCurrentDate(callback) { 
-  const now = new Date();
+// -----------------------
 
-  log(`Today: ${ now.toISOString() } \n ${ callback('Artem', 37) }`);
-}
+log(person[0], person['0']); // just 0 just 0 // тут уже ключ пишем массивом
+log(person["last name"]); // Miracle // правильно писать так 
 
-getInfoWithCurrentDate(getInfo);
+delete person[0]; // удаляем ключ 0
+log(person); // Object { name: "Artem", age: 37, isDeveloper: true, address: {…}, "last name": "Miracle" }
 
-// callback -> можно писать и так cb (он тоже может встречаться в проектах)
+// ------------------------------
 
-// --------------------------------------------
+log(person.greet()); // Hello, I am Artem!
+log(person.greetSecond()); // greetSecond!
 
-function survey(question, agreedFn, disagreedFn) { // опрос(запрос, ответ, ответ)
-  if (confirm(question)) {
-    agreedFn();
-  } else {
-    disagreedFn();
-  }
-}
+const prevName = person.name;
+log(prevName); // Artem
 
-survey(
-  'Ты мой друг!',
-  function () { log('Ты согласился, что ты мой друг!😀')},
-  function () { log('Ты на согласился, получается что ты не друг!😡')}
-);
+person.name = 'Алёша!';
+log(person.name); // Алёша!
 
+// ----------------------------
 
-// ---------- Стрелочные функции (arrow functions) ----------
+log(person.isHappy); // undefined // так как нет этого ключа в объекте
+person.isHappy = true;
+log(person.isHappy); // true
 
-const sum = (a, b) => {
-  return a + b;
-}
+// ---------------------------
 
-log(sum(3, 5)); // 8
-
-const multiplication = (a, b) => a * b; // тут уже есть return внутри если пишем без фигурных скобок
-
-log(multiplication(3, 5)); // 15
-
-const showName = name => `Name: ${ name }`;
-
-log(showName('Artem'));
-
-// -------------- IIFE -----------------
-// Немедленно вызывающая функция 
-// Immediately-invoked function expressions 
-
-(
-  function () {
-    var message = 'Hello!';
-    log(message);
-  }
-)();
-
-// log(message); // тут мы получим ошибку, так раньше делали чтобы var не выходил за глобальную 
-// область видимости, (тут пишем функцию)(), т.е. таким методом ограничиваем область видимости var
-
-(
-  function (name) {
-    var message = 'Hello!';
-    log(message, name); // Hello! Anna
-  }
-)('Anna'); 
-
-// Call Stack (Стек вызовов)
-
+log(person.hobby); // skiing, coding
+log(person);
 /* 
-function one() {
-  log('One');
-}
+  Object { 
+    name: "Алёша!", 
+    age: 37, isDeveloper: 
+    true, address: {…}, 
+    "last name": "Miracle", 
+    greet: greet(), 
+    greetSecond: greetSecond(), 
+    hobby: "skiing, coding", 
+    id: "13#smIsd@", 
+    isHappy: true 
+  }
 
-function two() {
-  log('Two');
-}
-
-function three() {
-  log('Three');
-}
-
-// тут всё вызовется по порядку
-one();
-two();
-three(); 
 */
+log(person.id); // 13#smIsd@
 
-function one() {
-  log('One');
-  two();
-}
+// -----------------------------
 
-function two() {
-  log('Two');
-  three();
-}
+log('age' in person); // true // 
+log('qwerty' in person); // false // 
 
-function three() {
-  log('Three');
-}
+// -------------------------- 
 
-one();
-// ответ будет такой:
-// One
-// Two
-// Three
+const newPerson = person; // присваиваем не объект, а ссылку,
+// поменяли в newPerson , тут же сразу меняется и в person
 
+log(newPerson === person); // true
+
+newPerson.age = 20;
+
+log(newPerson === person); // true
+log(newPerson.age, person.age); // 20 20
