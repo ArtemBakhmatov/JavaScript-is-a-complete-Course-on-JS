@@ -1,115 +1,139 @@
-// Объекты, методы, деструктуризация, for in, строгий режим (strict mode)
-"use strict";
+// JSON, local $ session storage
 
 const log = console.log;
 
-// -------------------------------------------
-// for in (цикл по объекту)
+/*
+  У нас есть объект, и мы хотели бы его преобразовать в строку, 
+  чтобы отправить по сети или просто вывести для логирования
 
-const user = {
-  id: 4,
-  name: 'Alice',
-  age: 25,
-  position: 'Developer',
-  address: {
-    country: 'Australia',
-    city: 'Sidney'
+  JSON (JavaScript Object Notation) - это общий формат данных для представления значений
+  и объектов, который имеет собственный независимый формат
+
+  JSON легко использовать для ОТМЕНА ДАННЫМИ по сети, когда клиент 
+  использует JavaScript, а сервер может быть написан на любом языке программирования
+
+  2 основных метода для работы с JSON 
+
+  -JSON.stringify для преобразования объектов в JSON.
+  -JSON.parse для преобразования JSON обратно в объект.
+
+  ключ и значение всегда в двойных кавычках (значения числовые и boolean можно писать без кавычек)
+*/
+
+const car = {
+  year: new Date(2024, 3, 1),
+  brand: 'audi',
+  color: 'blue',
+  power: 3.2
+};
+
+log(car); 
+// { year: Date Mon Apr 01 2024 00:00:00 GMT+0300, brand: "audi", color: "blue", power: 3.2 }
+
+const carJSON = JSON.stringify(car);
+log(carJSON);
+// {"year":"2024-03-31T21:00:00.000Z","brand":"audi","color":"blue","power":3.2}
+
+const carObject = JSON.parse(carJSON);
+log(carObject);
+// Object { year: "2024-03-31T21:00:00.000Z", brand: "audi", color: "blue", power: 3.2 }
+
+// log(carObject.year.getFullYear()); // будет ошибкой т.к. дата теперь строка, а не объект
+log(car.year.getFullYear()); // 2024
+
+const carObject2 = JSON.parse(carJSON, (key, value) => { // из строки дата делаем объект
+  if (key === 'year') {
+    return new Date(value);
   }
-};
 
-for (const key in user) {
-  log(`New User -> ${ key } : ${ user[key]}`);
-};
+  return value;
+});
 
-/* 
-  New User -> id : 4 
-  New User -> name : Alice 
-  New User -> age : 25 
-  New User -> position : Developer 
+log(carObject2); // теперь дата стала объектом 
+// { year: Date Mon Apr 01 2024 00:00:00 GMT+0300, brand: "audi", color: "blue", power: 3.2 }
+
+const car2 = {
+  inFast: true,
+  getInfo: () => log('Car info'),
+  isExpensive: undefined
+}
+
+const car2JSON = JSON.stringify(car2);
+log(car2JSON); // {"inFast":true} 
+// JSON понимает boolean тип, но не понимает функцию getInfo, поэтому его и не видно
+// JSON также не понимает undefined, поэтому ключа isExpensive и не видим 
+
+const car2Object = JSON.parse(car2JSON);
+
+log(car2Object); // Object { inFast: true }
+
+// ---------------------------------
+/*
+  Объекты веб-хранилища localStorage и sessionStorage позволяют хранить пары
+  ключ/значение в браузере
+
+  Что в них важно - данные, которые в них записаны, сохраняются после обновления страницы
+  (в случае sessionStorage) и даже после перезапуска браузера (при использовании localStorage)
 */
 
-log(Object.keys(user)); // Array(4) [ "id", "name", "age", "position" ] // массива ключей
+// localStorage.setItem("test", 123); // создает ключ со значением 123
+// localStorage.removeItem('test'); // удаляет ключ
+// localStorage.clear(); // очистить всё
 
-for (const key of Object.keys(user)) { // цикл массива
-  log(`New User -> ${ key } : ${ user[key]}`);
-}
+// log(localStorage.length); // 1 // одни ключ test
+// log(localStorage.key(0)) //  test
 
+const clients = [
+  { id: 1, level: 3, name: 'Lucy', status: 'online' },
+  { id: 2, level: 1, name: 'Rick', status: 'offline' },
+  { id: 3, level: 3, name: 'Jack', status: 'online' },
+  { id: 4, level: 2, name: 'Helen', status: 'online' },
+  { id: 5, level: 1, name: 'Alice', status: 'offline' },
+  { id: 6, level: 1, name: 'Derek', status: 'offline' },
+  { id: 7, level: 3, name: 'Megan', status: 'online' },
+];
+
+localStorage.setItem('clients', JSON.stringify(clients));
+
+const clientsFromStorage = localStorage.getItem('clients');
+log(clientsFromStorage);
 /* 
-  New User -> id : 4 
-  New User -> name : Alice 
-  New User -> age : 25 
-  New User -> position : Developer 
+  [
+    {"id":1,"level":3,"name":"Lucy","status":"online"},
+    {"id":2,"level":1,"name":"Rick","status":"offline"},
+    {"id":3,"level":3,"name":"Jack","status":"online"},
+    {"id":4,"level":2,"name":"Helen","status":"online"},
+    {"id":5,"level":1,"name":"Alice","status":"offline"},
+    {"id":6,"level":1,"name":"Derek","status":"offline"},
+    {"id":7,"level":3,"name":"Megan","status":"online"}
+  ] 
 */
 
-// ------ Деструктуризация, деструктуризующее присваивание --------
-// если массив, то вытягиваем по порядку, а если объект, то в любой последовательности
-const { name, ...restProps } = user;
-log(name, restProps); // Alice Object { id: 4, age: 25, position: "Developer" }
+const clientsFromStorage2 = JSON.parse(localStorage.getItem('clients'));
+log(clientsFromStorage2);
 
-const newUser = {
-  ...user // тут только поверхностное копирование // копирует только примитивы  
-}
-
-log(newUser); // Object { id: 4, name: "Alice", age: 25, position: "Developer" }
-
-log(newUser === user); // false
-
-newUser.name = 'Alex';
-log(newUser, user);
 /* 
-  Object { id: 4, name: "Alex", age: 25, position: "Developer" }
-  Object { id: 4, name: "Alice", age: 25, position: "Developer" } 
+  [
+    {id:1,level:3,name:"Lucy",status:"online"},
+    {id:2,level:1,name:"Rick",status:"offline"},
+    {id:3,level:3,name:"Jack",status:"online"},
+    {id:4,level:2,name:"Helen",status:"online"},
+    {id:5,level:1,name:"Alice",status:"offline"},
+    {id:6,level:1,name:"Derek",status:"offline"},
+    {id:7,level:3,name:"Megan",status:"online"}
+  ] 
 */
 
-newUser.address.city = 'Melbourne'; // он поменяется в двух объектах
+const clientsFromStorage3 = JSON.parse(localStorage.getItem('clients1') ?? '{}');
+log(clientsFromStorage3); // {}
 
-delete newUser.address.city; // удалиться у обоих объектов 
-delete newUser.address.country; // // удалиться у обоих объектов 
+// ---------------------------------------
 
-log(newUser, user);
+sessionStorage.setItem('test', 123)
+ 
+ 
 
 
-const obj1 = { a: 10, b: 20 };
-const obj2 = { c: 30, d: 40 };
-
-const obj3 = {
-  ...obj1,
-  ...obj2,
-  e: 50
-}
-
-log(obj3); // Object { a: 10, b: 20, c: 30, d: 40, e: 50 }
-
-const obj4 = Object.assign({}, obj1, obj2);
-log(obj4); // Object { a: 10, b: 20, c: 30, d: 40 }
-
-// -------------- Методы --------------------
-
-let x = Object.keys(user);
-log(x); // Array(5) [ "id", "name", "age", "position", "address" ]
-
-x = Object.values(user);
-log(x); // Array(5) [ 4, "Alice", 25, "Developer", {} ]
-
-x = Object.entries(user);
-log(x); // [ [ "id", 4 ], [ "name", "Alice" ], [ "age", 25 ], [ "position", "Developer" ], ["address", {}] ]
-
-x = Object.hasOwn(user, 'address');
-log(x); // true // так как в есть ключ address в объекте user
-
-x = Object.hasOwn(user, 'skills');
-log(x); // false 
-
-// есть по проще вариант
-x = 'address' in user;
-log(x); // true
-
-Object.freeze(user); // он замораживает объект // он будет выводится в консоли, но не получится
-// перезаписать ключи и не можем удалять
-
-function example(a, b) {
-  return a
-}
 
 
  
