@@ -1,137 +1,80 @@
-// JSON, local $ session storage
+// Window, DOM, BOM, Browser API
+// Про то, что такое API было рассказано во второму уроке
 
 const log = console.log;
 
 /*
-  У нас есть объект, и мы хотели бы его преобразовать в строку, 
-  чтобы отправить по сети или просто вывести для логирования
+  Объект window поддерживается всеми браузерами. Он представляет собой окно браузера
 
-  JSON (JavaScript Object Notation) - это общий формат данных для представления значений
-  и объектов, который имеет собственный независимый формат
+  Все глобальные объекты , функции и переменные JS автоматически становятся
+  членами объекта window.
 
-  JSON легко использовать для ОТМЕНА ДАННЫМИ по сети, когда клиент 
-  использует JavaScript, а сервер может быть написан на любом языке программирования
-
-  2 основных метода для работы с JSON 
-
-  -JSON.stringify для преобразования объектов в JSON.
-  -JSON.parse для преобразования JSON обратно в объект.
-
-  ключ и значение всегда в двойных кавычках (значения числовые и boolean можно писать без кавычек)
+  Глобальные переменные - это свойства объекта window.
+  Глобальные функции - это методы объекта window.
 */
 
-const car = {
-  year: new Date(2024, 3, 1),
-  brand: 'audi',
-  color: 'blue',
-  power: 3.2
-};
+// ------------- BROWSER API ------------------
+// ------- BOM (Browser Object Model) -------
+// Объектная модель браузера (BOM) позволят JS общаться с браузером
 
-log(car); 
-// { year: Date Mon Apr 01 2024 00:00:00 GMT+0300, brand: "audi", color: "blue", power: 3.2 }
+log(window);
+log(window.innerHeight); // 951 // высота страницы
+log(window.innerWidth); // 933 // ширина страницы
 
-const carJSON = JSON.stringify(car);
-log(carJSON);
-// {"year":"2024-03-31T21:00:00.000Z","brand":"audi","color":"blue","power":3.2}
+// window.open(); // открывает новую вкладку
+// window.open('https://ya.ru', '_blank'); //
+// window.open('https://ya.ru', '_self'); //
+// window.close(); // закрывает страницу
 
-const carObject = JSON.parse(carJSON);
-log(carObject);
-// Object { year: "2024-03-31T21:00:00.000Z", brand: "audi", color: "blue", power: 3.2 }
+// Объект window.screen содержит информацию об экране пользователя.
+// window.screen может быть записан без префикса window.
 
-// log(carObject.year.getFullYear()); // будет ошибкой т.к. дата теперь строка, а не объект
-log(car.year.getFullYear()); // 2024
+log(screen.width); // 1707 // ширина экрана 
+log(screen.height); // 1067 // высота экрана
+log(screen.pixelDepth); // 24 // глубина пикселя
 
-const carObject2 = JSON.parse(carJSON, (key, value) => { // из строки дата делаем объект
-  if (key === 'year') {
-    return new Date(value);
-  }
+// Объект window.location можно использовать для получения адреса текущей страницы (URL)
+// и для перенаправления браузера на новую строку.
 
-  return value;
-});
+log(location.href); // http://127.0.0.1:5500/ // возвращает текущую страницу
+log(location.hostname); // 127.0.0.1 // доменное имя
+log(location.pathname); // / -> в нашем случае данные после http://127.0.0.1:5500/тут данные 
+log(location.protocol); // http:
 
-log(carObject2); // теперь дата стала объектом 
-// { year: Date Mon Apr 01 2024 00:00:00 GMT+0300, brand: "audi", color: "blue", power: 3.2 }
+// Объект window.navigator содержит информацию о браузере посетителя.
 
-const car2 = {
-  inFast: true,
-  getInfo: () => log('Car info'),
-  isExpensive: undefined
-}
+log(navigator); // все данные о пользователе
+log(navigator.userAgent); // Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0
+log(navigator.userAgentData); // в сафари будет undefined
+log(navigator.geolocation);
+log(navigator.language); // en-US
 
-const car2JSON = JSON.stringify(car2);
-log(car2JSON); // {"inFast":true} 
-// JSON понимает boolean тип, но не понимает функцию getInfo, поэтому его и не видно
-// JSON также не понимает undefined, поэтому ключа isExpensive и не видим 
+// Объект window.history содержит историю браузера
+log(history); // History { length: 1, scrollRestoration: "auto", state: null }
 
-const car2Object = JSON.parse(car2JSON);
+// -------------------- alerts ----------------------
+// window.alert('Hello!');
 
-log(car2Object); // Object { inFast: true }
 
-// ---------------------------------
-/*
-  Объекты веб-хранилища localStorage и sessionStorage позволяют хранить пары
-  ключ/значение в браузере
+// ---------- DOM (Document Object Model) --------------
 
-  Что в них важно - данные, которые в них записаны, сохраняются после обновления страницы
-  (в случае sessionStorage) и даже после перезапуска браузера (при использовании localStorage)
-*/
+// DOM - это представление всей страницы как объекта.
+// Объект document - основная "входная точка".
+// С его помощью мы можем что-то создавать или менять на странице
 
-// localStorage.setItem("test", 123); // создает ключ со значением 123
-// localStorage.removeItem('test'); // удаляет ключ
-// localStorage.clear(); // очистить всё
+log(window.document);
+console.dir(window.document);
+log(document.body);
+log(document.head);
+log(document.head.innerHTML)
+document.body.style.backgroundColor = '#ff000069';
 
-// log(localStorage.length); // 1 // одни ключ test
-// log(localStorage.key(0)) //  test
+// --------------- JavaScript -----------------
 
-const clients = [
-  { id: 1, level: 3, name: 'Lucy', status: 'online' },
-  { id: 2, level: 1, name: 'Rick', status: 'offline' },
-  { id: 3, level: 3, name: 'Jack', status: 'online' },
-  { id: 4, level: 2, name: 'Helen', status: 'online' },
-  { id: 5, level: 1, name: 'Alice', status: 'offline' },
-  { id: 6, level: 1, name: 'Derek', status: 'offline' },
-  { id: 7, level: 3, name: 'Megan', status: 'online' },
-];
+log(window.Array.prototype);
+log(window.Object.prototype);
 
-localStorage.setItem('clients', JSON.stringify(clients));
 
-const clientsFromStorage = localStorage.getItem('clients');
-log(clientsFromStorage);
-/* 
-  [
-    {"id":1,"level":3,"name":"Lucy","status":"online"},
-    {"id":2,"level":1,"name":"Rick","status":"offline"},
-    {"id":3,"level":3,"name":"Jack","status":"online"},
-    {"id":4,"level":2,"name":"Helen","status":"online"},
-    {"id":5,"level":1,"name":"Alice","status":"offline"},
-    {"id":6,"level":1,"name":"Derek","status":"offline"},
-    {"id":7,"level":3,"name":"Megan","status":"online"}
-  ] 
-*/
-
-const clientsFromStorage2 = JSON.parse(localStorage.getItem('clients'));
-log(clientsFromStorage2);
-
-/* 
-  [
-    {id:1,level:3,name:"Lucy",status:"online"},
-    {id:2,level:1,name:"Rick",status:"offline"},
-    {id:3,level:3,name:"Jack",status:"online"},
-    {id:4,level:2,name:"Helen",status:"online"},
-    {id:5,level:1,name:"Alice",status:"offline"},
-    {id:6,level:1,name:"Derek",status:"offline"},
-    {id:7,level:3,name:"Megan",status:"online"}
-  ] 
-*/
-
-const clientsFromStorage3 = JSON.parse(localStorage.getItem('clients1') ?? '{}');
-log(clientsFromStorage3); // {}
-
-// ---------------------------------------
-
-sessionStorage.setItem('test', 123)
- 
- 
 
 
 
