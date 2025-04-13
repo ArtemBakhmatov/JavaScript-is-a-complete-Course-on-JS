@@ -1,72 +1,98 @@
-// DOM - basics, navigation
-/*
-  DOM позволяет нам делать что угодно с элементами и их содержим, но для начала
-  нужно получить соответствующий DOM-объект.
-
-  Все операции с DOM начинаются с объекта document. Это главная "точка".
-  Из него мы можем получить доступ к любому узлу.
-*/
+// DOM - создание, получение, добавление, удаление элементов
 
 const log = console.log;
 const dir = console.dir;
 
-// dir(document.documentElement);
-// dir(document.head);
-// dir(document.body);
+// querySelector - самый универсальный, удобный и популярный
 
-dir(document.children); // HTMLCollection { 0: html, length: 1 }
-dir(document.children[0].children); // HTMLCollection { 0: head, 1: body, length: 2 }
+const p = document.querySelector('p');
+log(p); // <p>text 1</p>
+dir(p); // p // тут получаем объект тега p
 
-dir(document.body.children); // HTMLCollection { 0: h1, 1: h2, 2: h3, 3: script, length: 4 }
-dir(document.body.children[0]); // <h1>
-dir(document.body.childElementCount); // 4 // т.е. всего четыре элемента в body
+const allP = document.querySelectorAll('p');
+log(allP); // NodeList(3) [p, p, p]
+dir(allP); // NodeList(3)
 
-dir(document.body.childNodes); // 13 // они также включают еще и текст и пробелы, перенос строки
+log(Array.from(allP)); // (3) [p, p, p]
 
-// NodeList - text, HTMLElements...
-// HTMLCollection - only HTMLElements...
+const lastText = document.querySelector('.last-text');
+// const lastText = document.querySelector('p[class="last-text"]');
+// const lastText = document.querySelector('[class="last-text"]');
 
-for (const child of document.body.children) {
-  if (child.tagName !== 'SCRIPT') {
-    dir(child); // dir может принимать только один документ
-    log('child: ', child); // 
-  }
-  // получим все элементы кроме элемента <script></script>
-}
-/* 
-  <h1>
-  <h2>
-  <h3>
-*/
+dir(lastText); // p.last-text
 
-const body = document.body;
-dir(body.firstChild); // #text "\n  " // тут также и с пробелами и с отступами // текстовая нода
-dir(body.firstElementChild); // h1> 
-dir(body.lastChild); //  // тут также и с пробелами и с отступами // текстовая нода
-dir(body.lastElementChild); 
+// const firstText = document.querySelector('#first-text');
+const firstText = document.getElementById('first-text');
+dir(firstText); // p#first-text
 
-body.firstElementChild.style.color = 'red';
-log(body.parentElement); // <html lang="en">, т.е. родителем является <html lang="en"> у body
-log(body.parentNode);
-log(body.parentElement.parentElement); // null
-log(body.parentNode.parentNode); // HTMLDocument http://127.0.0.1:5500/index.html
+const wrapper = document.querySelector('.wrapper');
+log(wrapper); 
 
-const h2 = document.body.children[1];
-log(h2);
+const firstText1 = wrapper.querySelector('#first-text');
+// const firstText1 = wrapper.getElementById('first-text'); // работать не будет
 
-log(h2.previousElementSibling); // h1 // получаем элемент который выше h2
-log(h2.nextElementSibling); // h3 // получаем элемент который ниже h2
-log(h2.textContent); // my
+// --------------------------------------------------------------------
+// getElementById* - возвращают живые коллекции, но лучше использовать querySelector
 
-// h2.textContent = 'Awesome!!'; // Awesome!!
-h2.textContent += ' Awesome!!'; // my Awesome!!
+const allTexts = document.getElementsByTagName('p');
+log(allTexts); // HTMLCollection(4) [p#first-text, p, p, p.last-text, first-text: p#first-text]
 
+// allTexts.forEach(element => log(element)); // получим ошибку
+allP.forEach(element => log(element)); 
 
+// Array.from(allP).forEach(element => log(element));
 
+// ------------------------------------------------------------------
 
+log(wrapper.textContent);
+log(wrapper.innerHTML);
+log(wrapper.outerHTML);
 
+// wrapper.textContent = 'hello';
+wrapper.innerHTML = '<p>text from js</p>';
+wrapper.innerHTML += '<p>text from js</p>';
 
+wrapper.prepend('text with prepend'); // текст добавился в начале wrapper
+wrapper.append('text with append'); // текст добавился в конце wrapper
 
+wrapper.before('text with before'); // текст добавился перед wrapper
+wrapper.after('text with after'); // текст добавился после wrapper
 
- 
+wrapper.append('<p>text from js</p>'); // text from js // тут теги уберутся из за безопасности
 
+const h2 = document.createElement('h2');
+h2.textContent = 'Наш созданный h2';
+log(h2); // <h2>Наш созданный H2</h2>
+
+wrapper.append(h2);
+
+lastText.innerHTML = ''; // очищает содержимое в lastText
+lastText.remove(); // удаляется весь тег
+
+// ----------------------------------------------------------
+// insertAdjacentHTML / Text / Element 
+
+const container = document.querySelector('.container');
+const h3 = document.createElement('h3');
+h3.textContent = 'наш созданный h3';
+
+// -- beforeBegin, afterBegin, beforeend, afterend --
+
+container.insertAdjacentElement('afterbegin', h3);
+
+container.insertAdjacentText('beforebegin','1) текст над контейнером');
+container.insertAdjacentText('afterBegin','2) текст в начале контейнера');
+container.insertAdjacentText('beforeend','3) текст в конце контейнера');
+container.insertAdjacentText('afterend','4) текст после контейнера');
+
+const buttonID = 123;
+container.insertAdjacentHTML('afterbegin', `
+  <hr>
+  <button id=${ buttonID }>кнопка</button>
+  <hr>
+`);
+
+// -----------------------------------------------------------
+// копирование документов
+
+const deepCopiedContainer = container.cloneNode(true);
