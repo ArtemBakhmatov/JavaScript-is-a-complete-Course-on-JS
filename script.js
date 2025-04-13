@@ -1,78 +1,67 @@
-// Window, DOM, BOM, Browser API
-// Про то, что такое API было рассказано во второму уроке
-
-const log = console.log;
-
+// DOM - basics, navigation
 /*
-  Объект window поддерживается всеми браузерами. Он представляет собой окно браузера
+  DOM позволяет нам делать что угодно с элементами и их содержим, но для начала
+  нужно получить соответствующий DOM-объект.
 
-  Все глобальные объекты , функции и переменные JS автоматически становятся
-  членами объекта window.
-
-  Глобальные переменные - это свойства объекта window.
-  Глобальные функции - это методы объекта window.
+  Все операции с DOM начинаются с объекта document. Это главная "точка".
+  Из него мы можем получить доступ к любому узлу.
 */
 
-// ------------- BROWSER API ------------------
-// ------- BOM (Browser Object Model) -------
-// Объектная модель браузера (BOM) позволят JS общаться с браузером
+const log = console.log;
+const dir = console.dir;
 
-log(window);
-log(window.innerHeight); // 951 // высота страницы
-log(window.innerWidth); // 933 // ширина страницы
+// dir(document.documentElement);
+// dir(document.head);
+// dir(document.body);
 
-// window.open(); // открывает новую вкладку
-// window.open('https://ya.ru', '_blank'); //
-// window.open('https://ya.ru', '_self'); //
-// window.close(); // закрывает страницу
+dir(document.children); // HTMLCollection { 0: html, length: 1 }
+dir(document.children[0].children); // HTMLCollection { 0: head, 1: body, length: 2 }
 
-// Объект window.screen содержит информацию об экране пользователя.
-// window.screen может быть записан без префикса window.
+dir(document.body.children); // HTMLCollection { 0: h1, 1: h2, 2: h3, 3: script, length: 4 }
+dir(document.body.children[0]); // <h1>
+dir(document.body.childElementCount); // 4 // т.е. всего четыре элемента в body
 
-log(screen.width); // 1707 // ширина экрана 
-log(screen.height); // 1067 // высота экрана
-log(screen.pixelDepth); // 24 // глубина пикселя
+dir(document.body.childNodes); // 13 // они также включают еще и текст и пробелы, перенос строки
 
-// Объект window.location можно использовать для получения адреса текущей страницы (URL)
-// и для перенаправления браузера на новую строку.
+// NodeList - text, HTMLElements...
+// HTMLCollection - only HTMLElements...
 
-log(location.href); // http://127.0.0.1:5500/ // возвращает текущую страницу
-log(location.hostname); // 127.0.0.1 // доменное имя
-log(location.pathname); // / -> в нашем случае данные после http://127.0.0.1:5500/тут данные 
-log(location.protocol); // http:
+for (const child of document.body.children) {
+  if (child.tagName !== 'SCRIPT') {
+    dir(child); // dir может принимать только один документ
+    log('child: ', child); // 
+  }
+  // получим все элементы кроме элемента <script></script>
+}
+/* 
+  <h1>
+  <h2>
+  <h3>
+*/
 
-// Объект window.navigator содержит информацию о браузере посетителя.
+const body = document.body;
+dir(body.firstChild); // #text "\n  " // тут также и с пробелами и с отступами // текстовая нода
+dir(body.firstElementChild); // h1> 
+dir(body.lastChild); //  // тут также и с пробелами и с отступами // текстовая нода
+dir(body.lastElementChild); 
 
-log(navigator); // все данные о пользователе
-log(navigator.userAgent); // Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0
-log(navigator.userAgentData); // в сафари будет undefined
-log(navigator.geolocation);
-log(navigator.language); // en-US
+body.firstElementChild.style.color = 'red';
+log(body.parentElement); // <html lang="en">, т.е. родителем является <html lang="en"> у body
+log(body.parentNode);
+log(body.parentElement.parentElement); // null
+log(body.parentNode.parentNode); // HTMLDocument http://127.0.0.1:5500/index.html
 
-// Объект window.history содержит историю браузера
-log(history); // History { length: 1, scrollRestoration: "auto", state: null }
+const h2 = document.body.children[1];
+log(h2);
 
-// -------------------- alerts ----------------------
-// window.alert('Hello!');
+log(h2.previousElementSibling); // h1 // получаем элемент который выше h2
+log(h2.nextElementSibling); // h3 // получаем элемент который ниже h2
+log(h2.textContent); // my
+
+// h2.textContent = 'Awesome!!'; // Awesome!!
+h2.textContent += ' Awesome!!'; // my Awesome!!
 
 
-// ---------- DOM (Document Object Model) --------------
-
-// DOM - это представление всей страницы как объекта.
-// Объект document - основная "входная точка".
-// С его помощью мы можем что-то создавать или менять на странице
-
-log(window.document);
-console.dir(window.document);
-log(document.body);
-log(document.head);
-log(document.head.innerHTML)
-document.body.style.backgroundColor = '#ff000069';
-
-// --------------- JavaScript -----------------
-
-log(window.Array.prototype);
-log(window.Object.prototype);
 
 
 
