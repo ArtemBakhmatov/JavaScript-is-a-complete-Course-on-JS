@@ -1,98 +1,91 @@
-// DOM - создание, получение, добавление, удаление элементов
+// DOM - styles and attributes
 
 const log = console.log;
 const dir = console.dir;
 
-// querySelector - самый универсальный, удобный и популярный
+document.body.style.backgroundColor = 'lightgrey';
 
-const p = document.querySelector('p');
-log(p); // <p>text 1</p>
-dir(p); // p // тут получаем объект тега p
+const block = document.querySelector('#block-1');
 
-const allP = document.querySelectorAll('p');
-log(allP); // NodeList(3) [p, p, p]
-dir(allP); // NodeList(3)
+// 1-й способ стилизации
+// block.style.backgroundColor = '#123456';
+// block.style.color = '#fff';
+// block.style.padding = '1em';
 
-log(Array.from(allP)); // (3) [p, p, p]
+// 2-й способ стилизации (лучше использовать 1-й)
+// block.style.cssText = `
+//   background-color = #123456;
+//   color = #fff;
+//   padding = 1em;
+// `;
 
-const lastText = document.querySelector('.last-text');
-// const lastText = document.querySelector('p[class="last-text"]');
-// const lastText = document.querySelector('[class="last-text"]');
+// 3-й способ стилизации
+block.classList.add('block'); // добавили класс block
+log(block.classList.contains('block')); // true
+// block.classList.remove('block'); // удалили класс block
 
-dir(lastText); // p.last-text
+block.classList.toggle('block'); // удалится класс block
+block.classList.toggle('block'); // добавиться класс block
 
-// const firstText = document.querySelector('#first-text');
-const firstText = document.getElementById('first-text');
-dir(firstText); // p#first-text
+block.classList.add('block', 'block--xl'); // добавляются два класса через запятую
 
-const wrapper = document.querySelector('.wrapper');
-log(wrapper); 
+// ------------------------------------------------------
+// getComputedStyle()
 
-const firstText1 = wrapper.querySelector('#first-text');
-// const firstText1 = wrapper.getElementById('first-text'); // работать не будет
+const button = document.querySelector('button');
+log(button.style.color); // в консоли ничего не получаем 
+log(button.style.backgroundColor); // в консоли ничего не получаем 
 
-// --------------------------------------------------------------------
-// getElementById* - возвращают живые коллекции, но лучше использовать querySelector
+const buttonComputedStyles = getComputedStyle(button);
+log(buttonComputedStyles.color); // rgb(0, 0, 0)
+log(buttonComputedStyles.backgroundColor); // rgb(240, 240, 240)
 
-const allTexts = document.getElementsByTagName('p');
-log(allTexts); // HTMLCollection(4) [p#first-text, p, p, p.last-text, first-text: p#first-text]
+button.style.fontSize = '16px';
+log(buttonComputedStyles.fontSize); // 16px
 
-// allTexts.forEach(element => log(element)); // получим ошибку
-allP.forEach(element => log(element)); 
+log(buttonComputedStyles.paddingLeft); // 6px
+log(buttonComputedStyles.paddingRight); // 6px
 
-// Array.from(allP).forEach(element => log(element));
+// button.style.paddingRight = '30px'; // 30px
+// button.style.paddingRight = 30 + buttonComputedStyles.paddingRight; // 306px
+button.style.paddingRight = `${ 20 + parseInt(buttonComputedStyles.paddingRight) }px`; // 26px
+button.style.paddingLeft = `${ 20 + parseInt(buttonComputedStyles.paddingLeft) }px`; // 26px
 
-// ------------------------------------------------------------------
-
-log(wrapper.textContent);
-log(wrapper.innerHTML);
-log(wrapper.outerHTML);
-
-// wrapper.textContent = 'hello';
-wrapper.innerHTML = '<p>text from js</p>';
-wrapper.innerHTML += '<p>text from js</p>';
-
-wrapper.prepend('text with prepend'); // текст добавился в начале wrapper
-wrapper.append('text with append'); // текст добавился в конце wrapper
-
-wrapper.before('text with before'); // текст добавился перед wrapper
-wrapper.after('text with after'); // текст добавился после wrapper
-
-wrapper.append('<p>text from js</p>'); // text from js // тут теги уберутся из за безопасности
-
-const h2 = document.createElement('h2');
-h2.textContent = 'Наш созданный h2';
-log(h2); // <h2>Наш созданный H2</h2>
-
-wrapper.append(h2);
-
-lastText.innerHTML = ''; // очищает содержимое в lastText
-lastText.remove(); // удаляется весь тег
+// ---------------------------------------------------------
+// getBoundingClientRect()
+log(button.getBoundingClientRect()); 
+// DOMRect {x: 8, y: 351.3333435058594, width: 113.78125, height: 24.666667938232422, top: 351.3333435058594, …}
 
 // ----------------------------------------------------------
-// insertAdjacentHTML / Text / Element 
+// Атрибуты
+log(block.hasAttribute('id')); // true
+log(block.hasAttribute('class')); // true
+log(block.hasAttribute('href')); // false
 
-const container = document.querySelector('.container');
-const h3 = document.createElement('h3');
-h3.textContent = 'наш созданный h3';
+log(block.getAttribute('class')); // block block--xl
+log(block.removeAttribute('id')); // undefined
 
-// -- beforeBegin, afterBegin, beforeend, afterend --
+block.setAttribute('title', 'Наш большой блок!');
 
-container.insertAdjacentElement('afterbegin', h3);
+const link = document.createElement('a');
+link.textContent = 'ссылка на ютуб';
+link.href = 'https://youtube.com';
+link.target = '_blank';
 
-container.insertAdjacentText('beforebegin','1) текст над контейнером');
-container.insertAdjacentText('afterBegin','2) текст в начале контейнера');
-container.insertAdjacentText('beforeend','3) текст в конце контейнера');
-container.insertAdjacentText('afterend','4) текст после контейнера');
+document.body.prepend(link);
+link.setAttribute('qwerty', 'Просто для текста!');
 
-const buttonID = 123;
-container.insertAdjacentHTML('afterbegin', `
-  <hr>
-  <button id=${ buttonID }>кнопка</button>
-  <hr>
-`);
+// ------------------------------------------------------
+// Data - Атрибуты
 
-// -----------------------------------------------------------
-// копирование документов
+const product = document.getElementById('product');
 
-const deepCopiedContainer = container.cloneNode(true);
+log(product.dataset);
+// DOMStringMap {id: '123#@%45', category: 'electronics', produceYear: ''}
+
+log(product.dataset.id); // 123#@%45
+log(product.dataset.category); // electronics
+log(product.dataset.produceYear); // тут пустая строка
+
+product.dataset.produceYear = 1999;
+log(product.dataset.produceYear); // 1999
