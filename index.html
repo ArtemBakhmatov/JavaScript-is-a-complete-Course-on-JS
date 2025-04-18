@@ -3,30 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <script src="/script.js" defer type="module"></script>
-  
-  <title>Events</title>
-  <style>
-    .block {
-      width: 150px;
-      height: 150px;
-      background-color: lightgreen;
-    }
-
-    button {
-      width: 150px;
-      height: 30px;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  <title>todo app</title>
 </head>
 <body>
-  
-  <button id="btn">Click me!</button>
-  <div class="block" id="block">block</div>
-  <hr>
-  <input type="text">
-
-  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate non provident molestiae exercitationem, voluptate mollitia dolorum nesciunt perferendis fugit numquam quas! Velit saepe incidunt id itaque nam at assumenda necessitatibus?</p>
+  <section class="todo">
+    <div class="text-field-wrapper">
+      <input type="text" data-text-field>
+      <button data-add-todo-btn>add todo</button>
+    </div>
+    <hr>
+    <div class="container" data-todo-container></div>
+  </section>
 </body>
 </html>

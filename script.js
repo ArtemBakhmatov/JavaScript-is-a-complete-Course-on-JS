@@ -1,61 +1,47 @@
-// Event - События
+const input = document.querySelector('[data-text-field]');
+const addTodoBtn = document.querySelector('[data-add-todo-btn]');
+const container = document.querySelector('[data-todo-container]');
 
-const log = console.log;
-
-const btn = document.querySelector('#btn');
-const block = document.querySelector('#block');
-const input = document.querySelector('input');
-const text = document.querySelector('p');
-
-// btn.onclick = () => log('Кнопка была нажата!');
-
-const btnClickListener = () => {
-  log('Кнопка была нажата!');
+const todoList = JSON.parse(localStorage.getItem('todos')) || [];
+const saveToLocalStorage = (key = 'todos') => {
+  localStorage.setItem(key, JSON.stringify(todoList));
 }
 
-btn.addEventListener('click', btnClickListener);
+addTodoBtn.addEventListener('click', () => {
+  if (input.value.trim()) {
+    todoList.push(input.value);
+    input.value = '';
 
-block.addEventListener('click', () => {
-  log('блок была нажат!');
+    saveToLocalStorage();
+
+    render();
+  }
 });
 
-input.addEventListener('input', () => {
-  log('пользователь что-то ввел!');
-});
+const createElement = (tagName, textContent) => {
+  const todo = document.createElement(tagName);
+  todo.textContent = textContent;
+  return todo;
+};
 
-window.addEventListener('resize', () => {
-  log('изменился размер окна!');
-});
+const removeTodo = (i) => {
+  todoList.splice(i, 1);
+  saveToLocalStorage()
+  render();
+}
 
-// -------------- removeEventListener ------------------
+const render = () => {
+  container.innerHTML = '';
+  todoList.forEach((item, i) => {
+    const todoElement = createElement('div', item);
+    const removeBtn = createElement('button', '❌');
 
-block.addEventListener('click', () => {
-  btn.removeEventListener('click', btnClickListener);
-});
+    removeBtn.addEventListener('click', () => removeTodo(i));
 
-// --------------- Объект Event --------------
+    todoElement.classList.add('todo-item');
+    todoElement.append(removeBtn);
+    container.append(todoElement);
+  });
+}
 
-
-input.addEventListener('input', (e) => {
-  log(e);
-  log(e.target);
-  log(e.target.value);
-});
-
-btn.addEventListener('click', (e) => {
-  log(e.clientX, e.clientY);
-  log(e.offsetX, e.offsetY);
-});
-
-window.addEventListener('resize', (e) => {
-  log(e.target.innerWidth, e.target.innerHeight);
-});
-
-text.addEventListener('copy', (e) => {
-  e.preventDefault();
-  log('Копирование запрещено!');
-});
-
-window.addEventListener('beforeunload', (e) => {
-  e.preventDefault();
-});
+render();
