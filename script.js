@@ -1,67 +1,60 @@
-// recursion
-// Рекурсия это когда функция вызывает саму себя
-const log = console.log;
+// this
 
-// 💎----------Возведение в натуральную степень----------💎
+// 1) Глобальный объект
+console.log(this); // В браузере выведет window, в Node.js - глобальный объект
 
-const pow = (x, n) => {
-  let result = 1;
+// 2) Методы объекта 
 
-  for (let i = 0; i < n; i++) {
-    result *= x;
+const person = {
+  name: 'Alex',
+  sayHello: function () {
+    console.log(`Hello, ${ this.name }`); // Выведет 'Hello, Alex' 
+    console.log(`Hello, ${ JSON.stringify(this) }`); // Hello, {"name":"Alex"}
   }
-
-  return result;
 }
 
-log(pow(2, 3)); // 8 
+person.sayHello(); // Выведет 'Hello, Alex' 
 
-const pow1 = (x, n) => {
-  if (n === 1) {
-    return x;
-  } else {
-    return x * pow(x, n - 1);
+// ----------------------------------------------------------------
+// this и  стрелочные функции
+
+const person1 = {
+  age: 33,
+  sayAge: () => {
+      console.log(`Age: ${this.age}`);
+  },
+  sayAgeWithContext: function () {
+      console.log(`Age: ${this.age}`);
   }
-  
+};
+
+const say = person1.sayAgeWithContext;
+say(); // Выведет "Age: undefined" 
+
+const boundSay = person1.sayAgeWithContext.bind(person1);
+boundSay(); // Выведет "Age: 33"
+
+// 4) см в index.html
+// -------------------------------------------------------
+// 5) call, apply и bind
+
+function greet (greeting, emoji) { // function, не стрелочная функция
+  console.log(`${ greeting }, ${ this.name } - ${ emoji }`);
 }
 
-log(pow1(2, 3)); // 8 
+const person2 = { name: 'Alex' };
 
-// 💎-------------Сумма чисел--------------💎
+greet('Hello', '🔥'); //Hello,  - 🔥
+greet.call(person2, 'Hello', '🔥'); // Hello, Alex - 🔥
+greet.apply(person2, ['Hi', '💋']); // Hi, Alex - 💋
 
-const sum = (n) => {
-  let sum = 0;
+const say1 = greet.bind(person2);
+say1('Hey', '🍷'); // Hey, Alex - 🍷
 
-  for (let i = 0; i <= n; i++) {
-    sum += i;
-  }
+// ------------------------------------------------------
+// Потеря контекста
+const sayAge = person1.sayAgeWithContext;
+sayAge(); // Age: undefined
 
-  return sum; // 15
-}
-
-log(sum(5)); // 1 + 2 + 3 + 4 + 5 = 15
-
-const sum1 = (n) => {
-  if (n === 1) return 1;
-  return n + sum(n - 1);
-}
-
-log(sum1(5)); // 1 + 2 + 3 + 4 + 5 = 15
-
-const sum3 = (n) => {
-  return n * (n + 1) / 2;
-}
-
-log(sum3(5)); // 1 + 2 + 3 + 4 + 5 = 15
-
-/* 
-Факториал — это произведение всех натуральных чисел от 1
-до данного числа. Например, факториал числа 5 будет равен
-1 × 2 × 3 × 4 × 5 = 120 
-*/
-
-const factorial = (n) => {
-  return (n != 1) ? n * factorial(n - 1) : 1;
-}
-
-log(factorial(5)) // 120
+const boundSayAge = person1.sayAgeWithContext.bind(person1);
+boundSayAge(); // Age: 33
