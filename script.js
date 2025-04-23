@@ -1,60 +1,72 @@
-// this
+// prototypes - прототипы 
 
-// 1) Глобальный объект
-console.log(this); // В браузере выведет window, в Node.js - глобальный объект
-
-// 2) Методы объекта 
-
-const person = {
-  name: 'Alex',
-  sayHello: function () {
-    console.log(`Hello, ${ this.name }`); // Выведет 'Hello, Alex' 
-    console.log(`Hello, ${ JSON.stringify(this) }`); // Hello, {"name":"Alex"}
-  }
+const animal = {
+  eats: true
 }
 
-person.sayHello(); // Выведет 'Hello, Alex' 
+const rabbit = {
+  jumps: true
+}
+
+rabbit.__proto__ = animal; // rabbit присваиваем animal
+
+console.log(rabbit.eats); // true
 
 // ----------------------------------------------------------------
-// this и  стрелочные функции
 
-const person1 = {
-  age: 33,
-  sayAge: () => {
-      console.log(`Age: ${this.age}`);
-  },
-  sayAgeWithContext: function () {
-      console.log(`Age: ${this.age}`);
+const animal1 = {
+  eat() {
+    console.log('Я ем!');
   }
 };
 
-const say = person1.sayAgeWithContext;
-say(); // Выведет "Age: undefined" 
+const dog = Object.create(animal1);
 
-const boundSay = person1.sayAgeWithContext.bind(person1);
-boundSay(); // Выведет "Age: 33"
+dog.eat();  // 'Я ем!
 
-// 4) см в index.html
-// -------------------------------------------------------
-// 5) call, apply и bind
-
-function greet (greeting, emoji) { // function, не стрелочная функция
-  console.log(`${ greeting }, ${ this.name } - ${ emoji }`);
+dog.bark = function() { // расширили наш объект
+  console.log('Гав!');
 }
 
-const person2 = { name: 'Alex' };
+dog.bark(); // Гав!
 
-greet('Hello', '🔥'); //Hello,  - 🔥
-greet.call(person2, 'Hello', '🔥'); // Hello, Alex - 🔥
-greet.apply(person2, ['Hi', '💋']); // Hi, Alex - 💋
+// ----------------------------------------------------------------
+// Функция - конструктор
 
-const say1 = greet.bind(person2);
-say1('Hey', '🍷'); // Hey, Alex - 🍷
+function Person(name) {
+  this.name = name;
+}
 
-// ------------------------------------------------------
-// Потеря контекста
-const sayAge = person1.sayAgeWithContext;
-sayAge(); // Age: undefined
+const john = new Person('John');
 
-const boundSayAge = person1.sayAgeWithContext.bind(person1);
-boundSayAge(); // Age: 33
+console.log(john); // Person {name: 'John'}
+
+Person.prototype.sayHello = function () { // sayHello -> придумываем название
+  console.log(`Привет, меня зовут ${ this.name }`);
+}
+
+john.sayHello(); // Привет, меня зовут John
+
+console.log(john instanceof Person); // true
+console.log(john.__proto__ === Person.prototype); // true
+
+// ----------------------------------------------------------------
+// можно добавить собственные методы к встроенным объектам
+
+Array.prototype.printElements = function () { // добавляем новые метод ко всем массивам
+  this.forEach((element, index) => {        // this указывает на массив, на котором метод вызывается
+      console.log(`Элемент ${index + 1}: ${element}`);
+  });
+};
+
+const myArray = [10, 20, 30, 40, 50];
+myArray.printElements();
+
+/* 
+  Элемент 1: 10
+  Элемент 2: 20
+  Элемент 3: 30
+  Элемент 4: 40
+  Элемент 5: 50 
+*/
+
