@@ -1,135 +1,68 @@
-// Classes - Классы
+/* 
+🧲 Задача: Магазин и корзина товаров 🧲
+
+Создайте класс Product, который будет представлять товар в магазине, и класс Cart, 
+который будет управлять корзиной покупок. Реализуйте следующие функции:
+
+Класс Product должен иметь свойства:
+
+1) name (название товара),
+2) price (цена товара).
+
+Класс Cart должен предоставлять методы:
+
+1) addProduct(product) — добавить товар в корзину.
+2) removeProduct(productName) — удалить товар из корзины по названию.
+3) getTotalPrice() — вернуть общую стоимость всех товаров в корзине.
+4) listProducts() — вывести список товаров в корзине.
+*/
+
+// --------------------------- Решение --------------------------------
 
 const log = console.log;
-
-// ------- Базовый синтаксис --------
-/* 
-    class MyClass {
-        // методы класса
-        constructor() { ... }
-        method1() { ... }
-        method2() { ... }
-        method3() { ... }
-        ...
-    }
-
-    - Вызов new MyClass() создает новый объект со всеми перечисленными методами;
-    - При этом автоматически вызывается метод constructor(), в нём можно инициализировать объект;
-*/
-
-class User {
-  constructor(name) {
+class Product {
+  constructor(name, price) {
     this.name = name;
-  }
-
-  greeting () {
-    log(`Hello, I am ${ this.name }`);
-  }
-
-  greet = () => {
-    log(`Hello, I am ${ this.name }`);
+    this.price = price;
   }
 }
 
-const userAles = new User('Alex');
-log(userAles); // User {name: 'Alex'}
-log(userAles.name); // Alex
+class Cart {
+  #products = [];
 
-userAles.greeting(); // Hello, I am Alex
-userAles.greet(); // Hello, I am Alex
+  constructor() {}
 
-const userOlga = new User('Olga');
-userOlga.greeting(); // Hello, I am Olga
-userOlga.greet(); // Hello, I am Olga
+  addProduct(...product) {
+    this.#products.push(...product);
+    product.forEach(product => log(`${ product.name } добавлен в корзину`));
+  }
 
-log(typeof User); // function
+  removeProduct(productName) {
+    this.#products = this.#products.filter((product) => product.name !== productName);
+    log(`${ productName } удален из корзины`);
+  }
 
+  getTotalPrice() {
+    const totalPrice = this.#products.reduce((total, product) => total + product.price, 0);
+    log(`Общая сумма товаров в корзине: ${totalPrice}`);
+  }
 
-
-// ------- new Function - Функция-конструктор --------
-
-function UserFnClass (name) {
-  this.name = name;
-
-  this.greeting = function () {
-    log(`Hello, I am ${this.name}`);
+  get listOfProducts() {
+    return this.#products;
   }
 }
 
-UserFnClass.prototype.greet = function () {
-  log(`Hello, I am ${this.name}`);
-}
+const cart = new Cart();
 
-/* 
-  со стрелочной функцией тут потеря контекста (this)
+const bread = new Product('Хлеб', 30);
+const apple = new Product('Яблоко', 50);
+const milk = new Product('Молоко', 60);
 
-  UserFnClass.prototype.greet = () => {
-      log(`Hello, I am ${this.name}`)
-  } 
-*/
+cart.addProduct(bread, apple, milk);
+// cart.addProduct(apple);
+// cart.addProduct(milk);
 
-const userFnVlad = new UserFnClass("Vlad");
+cart.removeProduct('Молоко');
+log(cart.listOfProducts);
 
-log(userFnVlad.name); // Vlad
-userFnVlad.greeting();  // Hello, I am Vlad
-userFnVlad.greet(); // Hello, I am Vlad
-
-// ------- Геттеры и Сеттеры. Класс с приватными полями --------
-
-class User1 {
-  profession = 'software engineer' // создали статичную переменную
-  #skills = ''; // приватное поле // можем менять с помощью get и set
-
-  constructor(name) {
-    this.name = name;
-  }
-
-  get skills() {
-    return this.#skills;
-  }
-
-  set skills(newSkills) {
-    if (typeof newSkills !== 'string') return
-    this.#skills = newSkills;
-  }
-}
-
-const userAnna = new User1('Anna');
-
-log(userAnna); // User1 {profession: 'software engineer', name: 'Anna'}
-
-userAnna.name = 'Anna Viktorovna';
-userAnna.profession = 'manager';
-
-log(userAnna); // User1 {profession: 'manager', name: 'Anna Viktorovna'}
-
-userAnna.skills = 'html, css, js';
-log(userAnna.skills); // html, css, js
-
-
-// ------- Класс со статическими методами и свойствами --------
-
-class User2 {
-  static #instanceCount = 0;
-
-  constructor(name) {
-    this.name = name;
-    User2.#instanceCount++;
-  }
-
-  greeting() {
-    log(`Hello, I am ${this.name}`)
-  }
-
-  static getInstanceCount() {  // static работает только в самом классе, не на экземплярах
-    return log(User2.#instanceCount);
-  }
-}
-
-const userKen = new User2("Ken");
-userKen.greeting(); // Hello, I am Ken
-
-const userNatalia = new User2("Natalia");
-userNatalia.greeting(); // Hello, I am Natalia
-
-User2.getInstanceCount(); // 2
+cart.getTotalPrice(); // Общая сумма товаров в корзине: 80
