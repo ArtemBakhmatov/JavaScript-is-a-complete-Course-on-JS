@@ -1,68 +1,127 @@
-/* 
-🧲 Задача: Магазин и корзина товаров 🧲
-
-Создайте класс Product, который будет представлять товар в магазине, и класс Cart, 
-который будет управлять корзиной покупок. Реализуйте следующие функции:
-
-Класс Product должен иметь свойства:
-
-1) name (название товара),
-2) price (цена товара).
-
-Класс Cart должен предоставлять методы:
-
-1) addProduct(product) — добавить товар в корзину.
-2) removeProduct(productName) — удалить товар из корзины по названию.
-3) getTotalPrice() — вернуть общую стоимость всех товаров в корзине.
-4) listProducts() — вывести список товаров в корзине.
-*/
-
-// --------------------------- Решение --------------------------------
-
 const log = console.log;
-class Product {
-  constructor(name, price) {
-    this.name = name;
-    this.price = price;
+
+class LocalStorage {
+  #keyName;
+
+  constructor(keyName) {
+    this.#keyName = keyName;
+  }
+
+  GetItem() {
+    const items = localStorage.getItem(this.#keyName);
+    return items ? JSON.parse(items) : [];
+  }
+
+  SetItem(itemsList) {
+    localStorage.setItem(this.#keyName, JSON.stringify(itemsList));
   }
 }
 
-class Cart {
-  #products = [];
-
+class DOM {
   constructor() {}
 
-  addProduct(...product) {
-    this.#products.push(...product);
-    product.forEach(product => log(`${ product.name } добавлен в корзину`));
+  query(selector) {
+    return document.querySelector(selector);
   }
 
-  removeProduct(productName) {
-    this.#products = this.#products.filter((product) => product.name !== productName);
-    log(`${ productName } удален из корзины`);
-  }
+  create(type, textContent, ...classNames) {
+    const item = document.createElement(type);
+    item.textContent = textContent;
+    item.classList.add(...classNames);
 
-  getTotalPrice() {
-    const totalPrice = this.#products.reduce((total, product) => total + product.price, 0);
-    log(`Общая сумма товаров в корзине: ${totalPrice}`);
-  }
-
-  get listOfProducts() {
-    return this.#products;
+    return item;
   }
 }
 
-const cart = new Cart();
+class Item { // для всех item-ов
+  constructor(id, text) {
+    this.id = id;
+    this.text = text;
+  }
+}
 
-const bread = new Product('Хлеб', 30);
-const apple = new Product('Яблоко', 50);
-const milk = new Product('Молоко', 60);
+class TodoItem extends Item { // тут можно расширять item
+  constructor(id, text, completed = false) {
+    super(id, text);
+    this.completed = completed;
+  }
+}
 
-cart.addProduct(bread, apple, milk);
-// cart.addProduct(apple);
-// cart.addProduct(milk);
+class TodoApp {
+  constructor() {
+    this.dom = new DOM();
+    this.todosStorage = new LocalStorage('todos');
 
-cart.removeProduct('Молоко');
-log(cart.listOfProducts);
+    this.todoList = this.todosStorage.GetItem();
+    this.todoInput = this.dom.query('[data-add-todo-input]');
+    this.todoContainer = this.dom.query('[data-todos-container]');
 
-cart.getTotalPrice(); // Общая сумма товаров в корзине: 80
+    this.bindEvents();
+    this.render();
+  }
+
+  addTodo(text) {
+    const newTodo = new TodoItem(Date.now(), text);
+
+    this.todoList.push(newTodo);
+    this.todosStorage.SetItem(this.todoList);
+    this.render();
+  }
+
+  removeTodo(id) {
+    this.todoList = this.todoList.filter(todo => todo.id !== id);
+    this.todosStorage.SetItem(this.todoList);
+    this.render();
+  }
+
+toggleTodo(id) {
+    const todo = this.todoList.find(todo => todo.id === id);
+    if (todo) {
+        todo.completed = !todo.completed;
+        this.todosStorage.SetItem(this.todoList);
+        this.render();
+    }
+}
+  
+  bindEvents() {
+    this.todoInput.addEventListener('keypress', (e) => {
+      if (e.key === "Enter" && e.target.value.trim()) {
+        // метод для добавления todo
+        this.addTodo(e.target.value.trim());
+        this.todoInput.value = '';
+      }
+      log(e.target.value);
+    });
+
+    this.todoContainer.addEventListener("click", (e) => {
+      const el = e.target;
+
+      if (el.classList.contains("remove-btn")) {
+          const id = Number(el.dataset.id);
+          this.removeTodo(id);
+      } else if (el.classList.contains("todo-item")) {
+          const id = Number(el.dataset.id);
+          this.toggleTodo(id);
+      }
+  })
+  }
+
+  render() {
+    this.todoContainer.innerHTML = '';
+    this.todoList.forEach(todo => {
+      const todoItem = this.dom.create('div', '', 'todo-item', todo.completed ? 'completed' : undefined);
+      todoItem.dataset.id = todo.id;
+      const todoItemText = this.dom.create("span", todo.text);
+
+      const removeBtn = this.dom.create('button', 'Удалить', 'remove-btn');
+      removeBtn.dataset.id = todo.id;
+      removeBtn.disabled = !todo.completed;
+
+      todoItem.appendChild(todoItemText);
+      todoItem.appendChild(removeBtn);
+      this.todoContainer.appendChild(todoItem);
+    })
+  }
+}
+
+new TodoApp();
