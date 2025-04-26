@@ -1,127 +1,91 @@
-const log = console.log;
+const images = [
+  "https://placehold.co/800x400?text=Slice+1",
+  "https://placehold.co/800x400?text=Slice+2",
+  "https://placehold.co/800x400?text=Slice+3",
+  "https://placehold.co/800x400?text=Slice+4",
+  "https://placehold.co/800x400?text=Slice+5",
+];
 
-class LocalStorage {
-  #keyName;
+const slider = document.querySelector("[data-slider]");
+const prevBtn = document.querySelector("[data-btn-prev]");
+const nextBtn = document.querySelector("[data-btn-next]");
 
-  constructor(keyName) {
-    this.#keyName = keyName;
-  }
+let currentIndex = 0;
+const ANIMATION_TIME = 0.5;
 
-  GetItem() {
-    const items = localStorage.getItem(this.#keyName);
-    return items ? JSON.parse(items) : [];
-  }
+const setupSlides = () => {
+  images.forEach((imageUrl, index) => {
+    const img = document.createElement("img");
+    img.classList.add('image')
+    img.src = imageUrl;
+    img.dataset.index = index;
+    img.alt = `slide ${index + 1}`;
 
-  SetItem(itemsList) {
-    localStorage.setItem(this.#keyName, JSON.stringify(itemsList));
-  }
+    slider.appendChild(img);
+  });
+
+  const firstClone = slider.firstElementChild.cloneNode(true);
+  const lastClone = slider.lastElementChild.cloneNode(true);
+
+  slider.appendChild(firstClone);
+  slider.insertBefore(lastClone, slider.firstChild);
 }
 
-class DOM {
-  constructor() {}
-
-  query(selector) {
-    return document.querySelector(selector);
-  }
-
-  create(type, textContent, ...classNames) {
-    const item = document.createElement(type);
-    item.textContent = textContent;
-    item.classList.add(...classNames);
-
-    return item;
-  }
+const initSlider = () => {
+  const slideWidth = slider.firstElementChild.offsetWidth;
+  slider.style.transition = `none`;
+  slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
 }
 
-class Item { // для всех item-ов
-  constructor(id, text) {
-    this.id = id;
-    this.text = text;
-  }
-}
+const goToPrevSlide = () => {
+  const slideWidth = slider.firstElementChild.offsetWidth;
 
-class TodoItem extends Item { // тут можно расширять item
-  constructor(id, text, completed = false) {
-    super(id, text);
-    this.completed = completed;
-  }
-}
+  currentIndex--;
+  slider.style.transition = `translate ${ANIMATION_TIME}s ease-in-out`;
+  slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
 
-class TodoApp {
-  constructor() {
-    this.dom = new DOM();
-    this.todosStorage = new LocalStorage('todos');
-
-    this.todoList = this.todosStorage.GetItem();
-    this.todoInput = this.dom.query('[data-add-todo-input]');
-    this.todoContainer = this.dom.query('[data-todos-container]');
-
-    this.bindEvents();
-    this.render();
-  }
-
-  addTodo(text) {
-    const newTodo = new TodoItem(Date.now(), text);
-
-    this.todoList.push(newTodo);
-    this.todosStorage.SetItem(this.todoList);
-    this.render();
-  }
-
-  removeTodo(id) {
-    this.todoList = this.todoList.filter(todo => todo.id !== id);
-    this.todosStorage.SetItem(this.todoList);
-    this.render();
-  }
-
-toggleTodo(id) {
-    const todo = this.todoList.find(todo => todo.id === id);
-    if (todo) {
-        todo.completed = !todo.completed;
-        this.todosStorage.SetItem(this.todoList);
-        this.render();
-    }
-}
-  
-  bindEvents() {
-    this.todoInput.addEventListener('keypress', (e) => {
-      if (e.key === "Enter" && e.target.value.trim()) {
-        // метод для добавления todo
-        this.addTodo(e.target.value.trim());
-        this.todoInput.value = '';
+  slider.addEventListener(
+    "transitionend",
+    () => {
+      if (currentIndex < 0) {
+        currentIndex = images.length - 1;
+        slider.style.transition = "none";
+        slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
       }
-      log(e.target.value);
-    });
-
-    this.todoContainer.addEventListener("click", (e) => {
-      const el = e.target;
-
-      if (el.classList.contains("remove-btn")) {
-          const id = Number(el.dataset.id);
-          this.removeTodo(id);
-      } else if (el.classList.contains("todo-item")) {
-          const id = Number(el.dataset.id);
-          this.toggleTodo(id);
-      }
-  })
-  }
-
-  render() {
-    this.todoContainer.innerHTML = '';
-    this.todoList.forEach(todo => {
-      const todoItem = this.dom.create('div', '', 'todo-item', todo.completed ? 'completed' : undefined);
-      todoItem.dataset.id = todo.id;
-      const todoItemText = this.dom.create("span", todo.text);
-
-      const removeBtn = this.dom.create('button', 'Удалить', 'remove-btn');
-      removeBtn.dataset.id = todo.id;
-      removeBtn.disabled = !todo.completed;
-
-      todoItem.appendChild(todoItemText);
-      todoItem.appendChild(removeBtn);
-      this.todoContainer.appendChild(todoItem);
-    })
-  }
+    }, 
+    { once: true }
+  )
 }
 
-new TodoApp();
+const goToNextSlide = () => {
+  const slideWidth = slider.firstElementChild.offsetWidth;
+
+  currentIndex++;
+  slider.style.transition = `translate ${ANIMATION_TIME}s ease-in-out`;
+  slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
+
+  if (currentIndex >= images.length) { 
+    nextBtn.disabled = true;
+  }
+
+  slider.addEventListener(
+    "transitionend",
+    () => {
+        if (currentIndex >= images.length) {
+          currentIndex = 0;
+          slider.style.transition = "none";
+          slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
+          nextBtn.disabled = false;
+        }
+    }, 
+    { once: true }
+  )
+}
+
+prevBtn.addEventListener("click", goToPrevSlide);
+nextBtn.addEventListener("click", goToNextSlide);
+
+setupSlides();
+initSlider();
+
+window.addEventListener("resize", initSlider);
