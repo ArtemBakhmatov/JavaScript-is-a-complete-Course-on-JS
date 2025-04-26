@@ -1,91 +1,45 @@
-const images = [
-  "https://placehold.co/800x400?text=Slice+1",
-  "https://placehold.co/800x400?text=Slice+2",
-  "https://placehold.co/800x400?text=Slice+3",
-  "https://placehold.co/800x400?text=Slice+4",
-  "https://placehold.co/800x400?text=Slice+5",
-];
+// setTimeout & setInterval
 
-const slider = document.querySelector("[data-slider]");
-const prevBtn = document.querySelector("[data-btn-prev]");
-const nextBtn = document.querySelector("[data-btn-next]");
+// setTimeout(() => alert("Hello!"), 1000);
+// setInterval(() => console.log("Hello!"), 1000);
 
-let currentIndex = 0;
-const ANIMATION_TIME = 0.5;
+// setTimeout(alert, 1000, "Hello");
 
-const setupSlides = () => {
-  images.forEach((imageUrl, index) => {
-    const img = document.createElement("img");
-    img.classList.add('image')
-    img.src = imageUrl;
-    img.dataset.index = index;
-    img.alt = `slide ${index + 1}`;
+// --------------------- манипулирование разметкой и счетчик ----------------------
 
-    slider.appendChild(img);
-  });
+setTimeout(() => {
+  document.querySelector("#title").textContent = "Hello!";
+}, 1000);
 
-  const firstClone = slider.firstElementChild.cloneNode(true);
-  const lastClone = slider.lastElementChild.cloneNode(true);
+let counter = 1;
+setInterval(() => {
+  document.querySelector("#title").textContent = `Hello! ${counter++}`;
+}, 1000);
 
-  slider.appendChild(firstClone);
-  slider.insertBefore(lastClone, slider.firstChild);
+// ------------------------ Часы ------------------------------
+
+const clock = () => {
+  const currentDate = new Date();
+
+  const hours = currentDate.getHours();
+  const minutes = currentDate.getMinutes();
+  const seconds = currentDate.getSeconds();
+
+  document.querySelector("#current-date").textContent = `${hours}:${minutes}:${seconds}`;
 }
 
-const initSlider = () => {
-  const slideWidth = slider.firstElementChild.offsetWidth;
-  slider.style.transition = `none`;
-  slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
+let intervalId;
+
+intervalId = setInterval(clock, 1000);
+
+document.querySelector("#btn").addEventListener("click", () => clearInterval(intervalId));
+
+// ------------------------ Пример асинхронного выполнения -------------------------
+
+setTimeout(() => alert("Hello!"), 1000);
+
+let res = 0;
+for (i = 0; i < 1222222222; i++) {
+  res++;
 }
-
-const goToPrevSlide = () => {
-  const slideWidth = slider.firstElementChild.offsetWidth;
-
-  currentIndex--;
-  slider.style.transition = `translate ${ANIMATION_TIME}s ease-in-out`;
-  slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
-
-  slider.addEventListener(
-    "transitionend",
-    () => {
-      if (currentIndex < 0) {
-        currentIndex = images.length - 1;
-        slider.style.transition = "none";
-        slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
-      }
-    }, 
-    { once: true }
-  )
-}
-
-const goToNextSlide = () => {
-  const slideWidth = slider.firstElementChild.offsetWidth;
-
-  currentIndex++;
-  slider.style.transition = `translate ${ANIMATION_TIME}s ease-in-out`;
-  slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
-
-  if (currentIndex >= images.length) { 
-    nextBtn.disabled = true;
-  }
-
-  slider.addEventListener(
-    "transitionend",
-    () => {
-        if (currentIndex >= images.length) {
-          currentIndex = 0;
-          slider.style.transition = "none";
-          slider.style.translate = `-${slideWidth * (currentIndex + 1)}px`;
-          nextBtn.disabled = false;
-        }
-    }, 
-    { once: true }
-  )
-}
-
-prevBtn.addEventListener("click", goToPrevSlide);
-nextBtn.addEventListener("click", goToNextSlide);
-
-setupSlides();
-initSlider();
-
-window.addEventListener("resize", initSlider);
+console.log(res);
