@@ -1,45 +1,127 @@
-// setTimeout & setInterval
+// promise
 
-// setTimeout(() => alert("Hello!"), 1000);
-// setInterval(() => console.log("Hello!"), 1000);
+// -------------- promise (база) --------------
 
-// setTimeout(alert, 1000, "Hello");
+// const promise = new Promise((resolve, reject) => resolve("Hello"));
+// promise.then((message) => console.log(message));
 
-// --------------------- манипулирование разметкой и счетчик ----------------------
+// const promise = new Promise((resolve, reject) => reject("Error!!!"));
+// promise.then((message) => console.log(message), (errorMessage) => console.log(errorMessage));
 
-setTimeout(() => {
-  document.querySelector("#title").textContent = "Hello!";
-}, 1000);
+// const promise = new Promise((resolve, reject) => reject(new Error("Error!!!")));
+// promise.then((message) => console.log(message), (error) => console.log(error.message));
 
-let counter = 1;
-setInterval(() => {
-  document.querySelector("#title").textContent = `Hello! ${counter++}`;
-}, 1000);
+// -------------- then, catch, finally --------------
 
-// ------------------------ Часы ------------------------------
+// const myPromise = new Promise((resolve, reject) => {
+//   // Асинхронная операция
+//   setTimeout(() => {
+//     const success = true;
 
-const clock = () => {
-  const currentDate = new Date();
+//     if (success) {
+//       resolve('Операция выполнена успешно!');
+//     } else {
+//       reject('Произошла ошибка!');
+//     }
+//   }, 2000);
+// });
 
-  const hours = currentDate.getHours();
-  const minutes = currentDate.getMinutes();
-  const seconds = currentDate.getSeconds();
+// myPromise
+//   .then((res) => console.log(res))
+//   .catch((error) => console.error(error))
+//   .finally(() => console.log('Завершение операции')); // сработает всегда (в любом случае)
 
-  document.querySelector("#current-date").textContent = `${hours}:${minutes}:${seconds}`;
+// -------------- Асинхронный запрос к серверу (симуляция) --------------
+
+const fetchData = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const data = { id: 1, name: "Dmitry" };
+        resolve(data);
+      }, 1000);
+  });
 }
 
-let intervalId;
+fetchData()
+  .then((data) => {
+    console.log("Полученные данные:", data);
+  })
+  .catch((error) => {
+    console.error("Ошибка загрузки данных:", error);
+})
 
-intervalId = setInterval(clock, 1000);
+// -------------- Цепочка Promise --------------
 
-document.querySelector("#btn").addEventListener("click", () => clearInterval(intervalId));
+const step1 = new Promise((res) => setTimeout(() => res("Шаг 1 выполнен"), 1000))
+const step2 = new Promise((res) => setTimeout(() => res("Шаг 2 выполнен"), 1000))
+const step3 = new Promise((res) => setTimeout(() => res("Шаг 3 выполнен"), 1000))
 
-// ------------------------ Пример асинхронного выполнения -------------------------
+step1
+  .then((result) => {
+    console.log(result);
+    return step2;
+  })
+  .then((result) => {
+    console.log(result);
+    return step3;
+  })
+  .then((result) => {
+    console.log(result);
+    console.log("Все шаги выполнены!");
+  });
 
-setTimeout(() => alert("Hello!"), 1000);
+// -------------- 🍏 МЕТОДЫ 🍏--------------
+// -------------- Promise.all --------------
 
-let res = 0;
-for (i = 0; i < 1222222222; i++) {
-  res++;
-}
-console.log(res);
+// Promise.all - запускается множество промисов параллельно и дожидаемся, пока все они выполнятся.
+
+const step4 = new Promise((res, rej) => setTimeout(() => rej("Шаг 4 сломался"), 1000))
+
+Promise.all([step1, step2, step3]) // тут должны быть все промисы положительным
+    .then((results) => {
+        console.log("[Promise.all] Все выполнены:", results);
+    })
+    .catch((err) => {
+        console.error("[Promise.all] Ошибка в одном из обещаний:", err);
+    });
+
+// -------------- Promise.allSettled --------------
+
+/* 
+Метод Promise.allSettled всегда ждёт завершения всех промисов. 
+
+В массиве результатов будет:
+{status:"fulfilled", value:результат} для успешных завершений,
+{status:"rejected", reason:ошибка} для ошибок.
+*/
+
+Promise.allSettled([step1, step2, step3, step4])
+    .then((results) => {
+        console.log("[Promise.allSettled] Все выполнены:", results);
+    })
+    .catch((err) => {
+        console.error("[Promise.allSettled] Ошибка в одном из обещаний:", err);
+    });
+
+// -------------- Promise.any --------------
+// Метод Promise.any всегда ждёт завершения первого промиса который выполнился успешно или
+// когда все промисы reject
+
+Promise.any([step1, step2, step3, step4])
+    .then((results) => {
+        console.log("[Promise.any] Выполнен первый:", results);
+    })
+    .catch((err) => {
+        console.error("[Promise.any] Ошибка в одном из обещаний:", err);
+    });
+
+// -------------- Promise.race --------------
+// Метод Promise.race всегда ждёт завершения самого первого промиса будет ли он resolve или reject.
+
+Promise.race([step1, step2, step3, step4])
+    .then((results) => {
+        console.log("[Promise.race] Выполнен первый:", results);
+    })
+    .catch((err) => {
+        console.error("[Promise.race] Ошибка в одном из обещаний:", err);
+    });
