@@ -1,127 +1,84 @@
-// promise
+// fetch, async, await, try, catch, finally
 
-// -------------- promise (база) --------------
+fetch('https://jsonplaceholder.typicode.com/todos?_limit=10')
+  .then(response => response.json())
+  .then(json => console.log(json))
 
-// const promise = new Promise((resolve, reject) => resolve("Hello"));
-// promise.then((message) => console.log(message));
+fetch('https://jsonplaceholder.typicode.com/todos?_limit=5')
+  .then(response => response.json())
+  .then(json => console.log(json))
 
-// const promise = new Promise((resolve, reject) => reject("Error!!!"));
-// promise.then((message) => console.log(message), (errorMessage) => console.log(errorMessage));
+// -------------- Renders posts ----------------
 
-// const promise = new Promise((resolve, reject) => reject(new Error("Error!!!")));
-// promise.then((message) => console.log(message), (error) => console.log(error.message));
+fetch('https://jsonplaceholder.typicode.com/posts?_limit=10', {
+  method: "GET",
+  headers: {
+    'Content-type': 'application/json; charset=UTF-8',
+  }
+})
+  .then(response => response.json())
+  .then(todos => { console.log(todos); renderPosts(todos) })
 
-// -------------- then, catch, finally --------------
+const renderPosts = (todos) => {
+  todos.forEach(todo => {
+    const todoContainer = document.createElement("div");
+    const todoTitle = document.createElement("h3");
+    const todoBody = document.createElement("p");
 
-// const myPromise = new Promise((resolve, reject) => {
-//   // Асинхронная операция
-//   setTimeout(() => {
-//     const success = true;
+    todoTitle.textContent = todo.title;
+    todoBody.textContent = todo.body;
+    todoContainer.append(todoTitle, todoBody);
 
-//     if (success) {
-//       resolve('Операция выполнена успешно!');
-//     } else {
-//       reject('Произошла ошибка!');
-//     }
-//   }, 2000);
-// });
-
-// myPromise
-//   .then((res) => console.log(res))
-//   .catch((error) => console.error(error))
-//   .finally(() => console.log('Завершение операции')); // сработает всегда (в любом случае)
-
-// -------------- Асинхронный запрос к серверу (симуляция) --------------
-
-const fetchData = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const data = { id: 1, name: "Dmitry" };
-        resolve(data);
-      }, 1000);
-  });
+    document.body.append(todoContainer);
+  })
 }
 
-fetchData()
-  .then((data) => {
-    console.log("Полученные данные:", data);
-  })
-  .catch((error) => {
-    console.error("Ошибка загрузки данных:", error);
-})
+// -------------- Renders posts (async & await) ----------------
 
-// -------------- Цепочка Promise --------------
+const renderPostsAsync = async () => {
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
+    const todos = await response.json();
 
-const step1 = new Promise((res) => setTimeout(() => res("Шаг 1 выполнен"), 1000))
-const step2 = new Promise((res) => setTimeout(() => res("Шаг 2 выполнен"), 1000))
-const step3 = new Promise((res) => setTimeout(() => res("Шаг 3 выполнен"), 1000))
+    todos.forEach(todo => {
+        const todoContainer = document.createElement("div");
+        const todoTitle = document.createElement("h3");
+        const todoBody = document.createElement("p");
 
-step1
-  .then((result) => {
-    console.log(result);
-    return step2;
-  })
-  .then((result) => {
-    console.log(result);
-    return step3;
-  })
-  .then((result) => {
-    console.log(result);
-    console.log("Все шаги выполнены!");
-  });
+        todoTitle.textContent = todo.title;
+        todoBody.textContent = todo.body;
+        todoContainer.append(todoTitle, todoBody);
 
-// -------------- 🍏 МЕТОДЫ 🍏--------------
-// -------------- Promise.all --------------
-
-// Promise.all - запускается множество промисов параллельно и дожидаемся, пока все они выполнятся.
-
-const step4 = new Promise((res, rej) => setTimeout(() => rej("Шаг 4 сломался"), 1000))
-
-Promise.all([step1, step2, step3]) // тут должны быть все промисы положительным
-    .then((results) => {
-        console.log("[Promise.all] Все выполнены:", results);
+        document.body.append(todoContainer);
     })
-    .catch((err) => {
-        console.error("[Promise.all] Ошибка в одном из обещаний:", err);
-    });
+}
 
-// -------------- Promise.allSettled --------------
+renderPostsAsync();
 
-/* 
-Метод Promise.allSettled всегда ждёт завершения всех промисов. 
+// -------------- Try, catch, finally ----------------
 
-В массиве результатов будет:
-{status:"fulfilled", value:результат} для успешных завершений,
-{status:"rejected", reason:ошибка} для ошибок.
-*/
+const renderPostsAsync1 = async () => {
+  try {
+    console.log("СТАРТ ПРОЦЕССА")
 
-Promise.allSettled([step1, step2, step3, step4])
-    .then((results) => {
-        console.log("[Promise.allSettled] Все выполнены:", results);
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=10');
+    const todos = await response.json();
+
+    todos.forEach(todo => {
+      const todoContainer = document.createElement("div");
+      const todoTitle = document.createElement("h3");
+      const todoBody = document.createElement("p");
+
+      todoTitle.textContent = todo.title;
+      todoBody.textContent = todo.body;
+      todoContainer.append(todoTitle, todoBody);
+
+      document.body.append(todoContainer);
     })
-    .catch((err) => {
-        console.error("[Promise.allSettled] Ошибка в одном из обещаний:", err);
-    });
+  } catch (error) {
+    console.error("ПОЙМАННАЯ ОШИБКА: ", error.message)
+  } finally {
+    console.log("ФИНИШ ПРОЦЕССА")
+  }
+}
 
-// -------------- Promise.any --------------
-// Метод Promise.any всегда ждёт завершения первого промиса который выполнился успешно или
-// когда все промисы reject
-
-Promise.any([step1, step2, step3, step4])
-    .then((results) => {
-        console.log("[Promise.any] Выполнен первый:", results);
-    })
-    .catch((err) => {
-        console.error("[Promise.any] Ошибка в одном из обещаний:", err);
-    });
-
-// -------------- Promise.race --------------
-// Метод Promise.race всегда ждёт завершения самого первого промиса будет ли он resolve или reject.
-
-Promise.race([step1, step2, step3, step4])
-    .then((results) => {
-        console.log("[Promise.race] Выполнен первый:", results);
-    })
-    .catch((err) => {
-        console.error("[Promise.race] Ошибка в одном из обещаний:", err);
-    });
+renderPostsAsync1();
