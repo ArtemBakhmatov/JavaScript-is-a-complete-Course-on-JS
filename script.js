@@ -1,54 +1,89 @@
-const form = document.querySelector("[data-search-form]");
-const input = document.querySelector("[data-search-input]");
-const userInfoContainer = document.querySelector("[data-user-info-container]");
-const reposContainer = document.querySelector("[data-repos-container]");
+import { roundToFiveDigits } from "./helpers.js";
 
+const firstSelect = document.querySelector("[data-first-select]");
+const secondSelect = document.querySelector("[data-second-select]");
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const username = input.value.trim();
+const swapBtn = document.querySelector("[data-swap-btn]");
+const comparisonInfo = document.querySelector("[data-comparison-info]");
 
-  if (!username) {
-    alert('Please enter a GitHub username');
-    return;
-  }
+const firstInput = document.querySelector("[data-first-input]");
+const secondInput = document.querySelector("[data-second-input]");
 
-  userInfoContainer.innerHTML = '<p>Loading...</p>';
-  reposContainer.innerHTML = "";
+const BASE_URL = "https://open.er-api.com/v6/latest";
+const FIRST_DEFAULT_CURRENCY = "USD";
+const SECOND_DEFAULT_CURRENCY = "BYN";
 
+let rates = {};
+
+// select events
+firstSelect.addEventListener("change", () => updateExchangeRates());
+secondSelect.addEventListener("change", () => renderInfo(rates));
+
+// input events
+firstInput.addEventListener("input", () => {
+  secondInput.value = roundToFiveDigits(firstInput.value * rates[secondSelect.value]);
+})
+secondInput.addEventListener("input", () => {
+  firstInput.value = roundToFiveDigits(secondInput.value / rates[secondSelect.value]);
+})
+
+// swap button event
+swapBtn.addEventListener("click", () => {
+  const temp = firstSelect.value;
+  firstSelect.value = secondSelect.value;
+  secondSelect.value = temp;
+
+  updateExchangeRates();
+})
+
+// update exchange rates
+const updateExchangeRates = async () => {
   try {
-    const userResponse = await fetch(`https://api.github.com/users/${username}`);
-    if (!userResponse.ok) throw new Error('User not found');
+    const response = await fetch(`${BASE_URL}/${firstSelect.value}`);
+    const data = await response.json();
 
-    const userData = await userResponse.json();
-
-    userInfoContainer.innerHTML = `
-      <div>
-        <img src="${userData.avatar_url}" alt="${userData.login}">
-        <h2>${userData.name || userData.login}</h2>
-        <p>${userData.bio || 'No bio available'}</p>
-      </div>
-    `;
-
-    const reposResponse = await fetch(userData.repos_url);
-    if (!reposResponse.ok) throw new Error('Could not fetch repos');
-
-    const repos = await reposResponse.json();
-
-    if (repos.length) {
-      reposContainer.innerHTML = '<h3>Repositories:</h3>';
-
-      repos.forEach(repo => {
-        reposContainer.innerHTML += `
-          <div class="repo">
-            <a href="${repo.html_url}" target="_blank">${repo.name}</a>
-          </div>
-        `;
-      });
-    } else {
-      reposContainer.innerHTML = '<p>No repositories found</p>';
-    }
+    rates = data.rates;
+    renderInfo();
   } catch (error) {
-    userInfoContainer.innerHTML = `<p>${error.message}</p>`;
+    console.error(error.message);
   }
-});
+}
+
+// render info
+const renderInfo = () => {
+  comparisonInfo.textContent = `1 ${firstSelect.value} = ${rates[secondSelect.value]} ${secondSelect.value}`;
+
+  firstInput.value = rates[firstSelect.value];
+  secondInput.value = rates[secondSelect.value];
+}
+
+// populate selects
+const populateSelect = () => {
+  firstSelect.innerHTML = "";
+  secondSelect.innerHTML = "";
+
+  for (const currency of Object.keys(rates)) {
+    firstSelect.innerHTML += `
+      <option value="${currency}" ${currency === FIRST_DEFAULT_CURRENCY ? "selected" : ""}>${currency}</option>
+    `
+    secondSelect.innerHTML += `
+      <option value="${currency}" ${currency === SECOND_DEFAULT_CURRENCY ? "selected" : ""}>${currency}</option>
+    `
+  }
+}
+
+// getInitialRates - initial fn to populate selects
+const getInitialRates = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/${FIRST_DEFAULT_CURRENCY}`);
+    const data = await response.json();
+
+    rates = data.rates;
+    populateSelect();
+    renderInfo();
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+getInitialRates();
